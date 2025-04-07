@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.pg</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.3.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <artifactId>imports</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0</version>
+
+    <name>pg.imports</name>
+    <description>pg.imports</description>
+
+    <properties>
+        <project.version>1.0.0</project.version>
+
+        <pg-lib-common.version>1.5.0</pg-lib-common.version>
+        <pg-kafka.version>1.0.0</pg-kafka.version>
+    </properties>
+
+    <modules>
+        <module>plugin.api</module>
+        <module>plugin.infrastructure.spring</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.pg</groupId>
+                <artifactId>pg-kafka</artifactId>
+                <version>${pg-kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.pg</groupId>
+                <artifactId>pg-lib-common</artifactId>
+                <version>${pg-lib-common.version}</version>
+            </dependency>
+
+            <!-- Internal -->
+            <dependency>
+                <groupId>org.pg</groupId>
+                <artifactId>pg-plugin-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.pg</groupId>
+                <artifactId>pg-plugin-infrastructure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.pg</groupId>
+                <artifactId>pg-plugin-infrastructure-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 3rd party -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+            </dependency>
+
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Test -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/PG-Personal-Organization</url>
+        </repository>
+    </repositories>
+
+</project>
