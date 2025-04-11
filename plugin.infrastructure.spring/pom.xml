@@ -17,7 +17,49 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.pg</groupId>
-			<artifactId>pg-plugin-api</artifactId>
+			<artifactId>pg-plugin-infrastructure</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.pg</groupId>
+			<artifactId>pg-kafka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.pg</groupId>
+			<artifactId>pg-lib-aws-files</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-batch</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<scope>annotationProcessor</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 	</dependencies>

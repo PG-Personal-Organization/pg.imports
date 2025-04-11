@@ -22,10 +22,13 @@
 
         <pg-lib-common.version>1.5.0</pg-lib-common.version>
         <pg-kafka.version>1.0.0</pg-kafka.version>
+        <hibernate-core.version>6.5.3.Final</hibernate-core.version>
+        <hibernate-utils.version>3.9.0</hibernate-utils.version>
     </properties>
 
     <modules>
         <module>plugin.api</module>
+        <module>plugin.infrastructure</module>
         <module>plugin.infrastructure.spring</module>
     </modules>
 
@@ -38,7 +41,7 @@
             </dependency>
             <dependency>
                 <groupId>org.pg</groupId>
-                <artifactId>pg-lib-common</artifactId>
+                <artifactId>pg-lib-aws-files</artifactId>
                 <version>${pg-lib-common.version}</version>
             </dependency>
 
@@ -61,31 +64,14 @@
 
             <!-- 3rd party -->
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate-core.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-            </dependency>
-
-            <!-- Lombok -->
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <scope>provided</scope>
-            </dependency>
-
-            <!-- Test -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <scope>test</scope>
+                <groupId>io.hypersistence</groupId>
+                <artifactId>hypersistence-utils-hibernate-60</artifactId>
+                <version>${hibernate-utils.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
