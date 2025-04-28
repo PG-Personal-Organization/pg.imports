@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import pg.plugin.api.ImportRecordStatus;
+import pg.plugin.api.data.ImportRecordStatus;
 
 import java.util.UUID;
 

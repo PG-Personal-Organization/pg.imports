@@ -24,6 +24,7 @@
         <pg-kafka.version>1.0.0</pg-kafka.version>
         <hibernate-core.version>6.5.3.Final</hibernate-core.version>
         <hibernate-utils.version>3.9.0</hibernate-utils.version>
+        <beanio.version>2.1.0</beanio.version>
     </properties>
 
     <modules>
@@ -41,7 +42,12 @@
             </dependency>
             <dependency>
                 <groupId>org.pg</groupId>
-                <artifactId>pg-lib-aws-files</artifactId>
+                <artifactId>pg-lib-aws-files-api</artifactId>
+                <version>${pg-lib-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.pg</groupId>
+                <artifactId>pg-lib-aws-files-infrastructure</artifactId>
                 <version>${pg-lib-common.version}</version>
             </dependency>
 
@@ -72,6 +78,11 @@
                 <groupId>io.hypersistence</groupId>
                 <artifactId>hypersistence-utils-hibernate-60</artifactId>
                 <version>${hibernate-utils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.beanio</groupId>
+                <artifactId>beanio</artifactId>
+                <version>${beanio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

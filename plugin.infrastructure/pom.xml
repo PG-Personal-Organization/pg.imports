@@ -21,6 +21,15 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.pg</groupId>
+			<artifactId>pg-kafka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.pg</groupId>
+			<artifactId>pg-lib-aws-files-api</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
 		</dependency>

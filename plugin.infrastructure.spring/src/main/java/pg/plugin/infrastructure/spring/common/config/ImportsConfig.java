@@ -3,7 +3,7 @@ package pg.plugin.infrastructure.spring.common.config;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import pg.plugin.api.strategies.RecordsStoring;
+import pg.plugin.api.strategies.RecordsStoringStrategy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,15 +12,15 @@ import java.util.Map;
 @Configuration
 @Data
 public class ImportsConfig {
-    KafkaImportsMessage kafkaImportsMessage;
+    private KafkaImportsMessageStrategy kafkaImportsMessageStrategy;
 
-    RecordsStoring recordsStoring;
+    private RecordsStoringStrategy recordsStoringStrategy;
 
-    ImportStrategy importStrategy;
+    private ImportStrategy importStrategy;
 
-    ImportStrategy parsingStrategy;
+    private ImportStrategy parsingStrategy;
 
-    Map</*PluginCode*/ String, KafkaImportsMessage> pluginsKafkaImportsMessage = new HashMap<>();
+    private Map</*PluginCode*/ String, KafkaImportsMessageStrategy> pluginsKafkaImportsMessage = new HashMap<>();
 
-    Map</*PluginCode*/ String, RecordsStoring> pluginsDatabaseRecordsStoring = new HashMap<>();
+    private Map</*PluginCode*/ String, RecordsStoringStrategy> pluginsDatabaseRecordsStoring = new HashMap<>();
 }
