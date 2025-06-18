@@ -3,11 +3,11 @@ package pg.plugin.infrastructure.persistence.records;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pg.plugin.infrastructure.persistence.imports.ImportEntity;
+import pg.plugin.infrastructure.states.InParsingImport;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity(name = "imported_records")
 @Getter
@@ -21,6 +21,9 @@ public class ImportRecordsEntity {
     private String id;
 
     @Column(nullable = false)
+    private String partitionNumber;
+
+    @Column(nullable = false)
     private LocalDateTime createdOn;
 
     private LocalDateTime finishedParsingOn;
@@ -32,25 +35,47 @@ public class ImportRecordsEntity {
     @ElementCollection
     private Set<String> recordIds = new HashSet<>();
 
+    @ElementCollection
+    private Set<String> errorRecordIds = new HashSet<>();
+
     private int count;
+
+    private int errorCount;
+
+    @ElementCollection
+    private Map</* recordId*/String, /* errorMessages*/String> errorMessages = new HashMap<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
-    private ImportRecordsEntity parent;
+    private ImportEntity parent;
 
     @Override
-    public boolean equals(final Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
         ImportRecordsEntity that = (ImportRecordsEntity) o;
-        return count == that.count && Objects.equals(id, that.id) && Objects.equals(createdOn, that.createdOn) && Objects.equals(finishedParsingOn, that.finishedParsingOn)
-                && Objects.equals(startedImportingOn, that.startedImportingOn) && Objects.equals(finishedImportingOn, that.finishedImportingOn)
-                && Objects.equals(recordIds, that.recordIds) && Objects.equals(parent, that.parent);
+        return count == that.count && errorCount == that.errorCount && Objects.equals(id, that.id) && Objects.equals(partitionNumber, that.partitionNumber) && Objects.equals(createdOn, that.createdOn) && Objects.equals(finishedParsingOn, that.finishedParsingOn) && Objects.equals(startedImportingOn, that.startedImportingOn) && Objects.equals(finishedImportingOn, that.finishedImportingOn) && Objects.equals(recordIds, that.recordIds) && Objects.equals(errorRecordIds, that.errorRecordIds) && Objects.equals(errorMessages, that.errorMessages) && Objects.equals(parent, that.parent);
     }
 
     @Override
-    public final int hashCode() {
-        return getClass().hashCode();
+    public int hashCode() {
+        return Objects.hash(id, partitionNumber, createdOn, finishedParsingOn, startedImportingOn, finishedImportingOn, recordIds, errorRecordIds, count, errorCount, errorMessages, parent);
+    }
+
+    public static ImportRecordsEntity from(final InParsingImport parsingImport,
+                                           final String partitionNumber,
+                                           final List<String> recordIds,
+                                           final List<String> errorRecordIds,
+                                           final Map<String, String> errorMessages) {
+        return ImportRecordsEntity.builder()
+                .id(String.format("IMP_REC_%s_%s", parsingImport.getImportId(), partitionNumber))
+                .parent((ImportEntity) parsingImport)
+                .partitionNumber(partitionNumber)
+                .recordIds(new HashSet<>(recordIds))
+                .errorRecordIds(new HashSet<>(errorRecordIds))
+                .errorMessages(errorMessages)
+                .count(recordIds.size())
+                .errorCount(errorRecordIds.size())
+                .finishedParsingOn(LocalDateTime.now())
+                .build();
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.transaction.annotation.Transactional;
 import pg.plugin.api.data.ImportContext;
 import pg.plugin.api.data.ImportId;
 import pg.plugin.api.data.PluginCode;
@@ -25,6 +26,7 @@ public class ParsingInitializerTasklet implements Tasklet {
     private final ImportsConfigProvider importsConfigProvider;
 
     @Override
+    @Transactional
     public RepeatStatus execute(final @NonNull StepContribution contribution, @NonNull final ChunkContext chunkContext) throws Exception {
         ImportId importId = JobUtil.getImportId(contribution);
         ImportEntity scheduledImport = importRepository.getParsingImport(importId.id());

@@ -43,14 +43,16 @@ public class ConfigurationBasedParsingJobLauncher implements ParsingJobLauncher 
                     jobExecution = jobLauncher.run(localParallelParsingJob, defaultJobParameters);
                     log.info("LocalParallelParsingJob launched with importId={} and content={}.", inParsingImport.getImportId(), jobExecution);
                 }
-                case DISTRIBUTED_PARALLEL -> {
-                    jobExecution = jobLauncher.run(distributedParallelParsingJob, defaultJobParameters);
-                    log.info("DistributedParallelParsingJob launched with importId={} and content={}.", inParsingImport.getImportId(), jobExecution);
-                }
+// TODO
+//                case DISTRIBUTED_PARALLEL -> {
+//                    jobExecution = jobLauncher.run(distributedParallelParsingJob, defaultJobParameters);
+//                    log.info("DistributedParallelParsingJob launched with importId={} and content={}.", inParsingImport.getImportId(), jobExecution);
+//                }
                 case DISTRIBUTED -> {
                     jobExecution = jobLauncher.run(distributedParsingJob, defaultJobParameters);
                     log.info("DistributedParsingJob launched with importId={} and content={}.", inParsingImport.getImportId(), jobExecution);
                 }
+                default -> throw new IllegalArgumentException("Unknown parsing strategy: " + importsConfigProvider.getParsingStrategy());
             }
         } catch (final Exception e) {
             log.error(e.getLocalizedMessage(), e);

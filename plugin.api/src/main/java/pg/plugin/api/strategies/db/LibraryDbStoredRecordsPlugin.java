@@ -6,6 +6,6 @@ import pg.plugin.api.strategies.RecordsStoringStrategy;
 /**
  * Used with {@link RecordsStoringStrategy#LIBRARY_JSON_DATABASE}
  * */
-public interface LibraryDbStoredRecordsPlugin<T extends RecordData> extends ImportPlugin {
+public interface LibraryDbStoredRecordsPlugin<T extends RecordData> extends ImportPlugin<T> {
     Class<T> getRecordClass();
 }

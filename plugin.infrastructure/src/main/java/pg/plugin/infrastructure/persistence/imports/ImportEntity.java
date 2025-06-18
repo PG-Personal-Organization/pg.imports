@@ -4,11 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import pg.plugin.api.data.ImportId;
 import pg.plugin.api.data.PluginCode;
-import pg.plugin.infrastructure.states.AfterParsingImport;
-import pg.plugin.infrastructure.states.Import;
-import pg.plugin.infrastructure.states.NewImport;
+import pg.plugin.infrastructure.states.*;
 import pg.plugin.infrastructure.persistence.records.ImportRecordsEntity;
-import pg.plugin.infrastructure.states.InParsingImport;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @ToString
-public class ImportEntity implements NewImport, InParsingImport, AfterParsingImport, Import {
+public class ImportEntity implements NewImport, InParsingImport, AfterParsingImport, RejectedImport, Import {
     @Id
     private String id;
 
@@ -54,6 +51,8 @@ public class ImportEntity implements NewImport, InParsingImport, AfterParsingImp
     @ToString.Exclude
     private List<ImportRecordsEntity> records;
 
+    private String rejectedReason;
+
     @Override
     public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -63,7 +62,8 @@ public class ImportEntity implements NewImport, InParsingImport, AfterParsingImp
         return Objects.equals(id, that.id) && Objects.equals(createdOn, that.createdOn) && Objects.equals(startedParsingOn, that.startedParsingOn)
                 && Objects.equals(endedParsingOn, that.endedParsingOn) && Objects.equals(startedImportingOn, that.startedImportingOn)
                 && Objects.equals(finishedImportingOn, that.finishedImportingOn) && status == that.status && Objects.equals(fileId, that.fileId)
-                && Objects.equals(pluginCode, that.pluginCode) && Objects.equals(userId, that.userId) && Objects.equals(records, that.records);
+                && Objects.equals(pluginCode, that.pluginCode) && Objects.equals(userId, that.userId) && Objects.equals(records, that.records)
+                && Objects.equals(rejectedReason, that.rejectedReason);
     }
 
     @Override
@@ -86,6 +86,14 @@ public class ImportEntity implements NewImport, InParsingImport, AfterParsingImp
     @Override
     public PluginCode getPluginCode() {
         return new PluginCode(pluginCode);
+    }
+
+    @Override
+    public RejectedImport rejectParsing(final String reason) {
+        this.status = ImportStatus.PARSING_FAILED;
+        this.rejectedReason = reason;
+        this.endedParsingOn = LocalDateTime.now();
+        return this;
     }
 
     @Override

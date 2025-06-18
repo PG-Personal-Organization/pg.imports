@@ -5,6 +5,7 @@ public enum ImportStatus {
     ONGOING_PARSING,
     PARSING_FINISHED,
     ONGOING_IMPORTING,
-    FAILED,
+    PARSING_FAILED,
+    IMPORTING_FAILED,
     COMPLETED,
 }

@@ -1,0 +1,46 @@
+package pg.plugin.infrastructure.parsing;
+
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.transaction.annotation.Transactional;
+import pg.kafka.consumer.MessageHandler;
+import pg.plugin.infrastructure.persistence.imports.ImportEntity;
+import pg.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.plugin.infrastructure.plugins.ImportPluginNotFoundException;
+import pg.plugin.infrastructure.plugins.PluginCache;
+import pg.plugin.infrastructure.processing.events.RejectImportParsingEvent;
+
+@Log4j2
+@RequiredArgsConstructor
+public class RejectedImportParsingMessageHandler implements MessageHandler<RejectImportParsingEvent> {
+    private final ImportRepository importRepository;
+    private final PluginCache pluginCache;
+
+    @Override
+    @Transactional
+    public void handleMessage(final @NonNull RejectImportParsingEvent message) {
+        var importId = message.getImportId();
+        ImportEntity parsingImport = importRepository.getParsingImport(importId.id());
+
+        var plugin = pluginCache.tryGetPlugin(parsingImport.getPluginCode())
+                .orElseThrow(() -> new ImportPluginNotFoundException(String.format("Import plugin with code %s not found", parsingImport.getPluginCode())));
+
+        try {
+            if (message.getReason() != null && !message.getRecordIds().isEmpty()) {
+                plugin.getParsingComponentProvider().getRecordsParsingErrorHandler().handleError(message.getRecordIds());
+            }
+        } catch (final Exception e) {
+            log.error("Error occurred during error handling in plugin, continuing without plugin involvement.", e);
+        }
+
+        parsingImport.rejectParsing(message.getReason());
+        importRepository.save(parsingImport);
+        log.info("Import {} parsing finished with error: {}", parsingImport, message.getReason());
+    }
+
+    @Override
+    public Class<RejectImportParsingEvent> getMessageType() {
+        return RejectImportParsingEvent.class;
+    }
+}

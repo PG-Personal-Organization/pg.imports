@@ -7,10 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pg.kafka.consumer.MessageHandler;
 import pg.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.plugin.infrastructure.persistence.imports.ImportRepository;
-import pg.plugin.infrastructure.persistence.imports.ImportStatus;
 import pg.plugin.infrastructure.plugins.ImportPluginNotFoundException;
 import pg.plugin.infrastructure.plugins.PluginCache;
-import pg.plugin.infrastructure.processing.errors.ScheduledImportNotExistException;
 import pg.plugin.infrastructure.processing.events.ScheduledImportEvent;
 
 @Log4j2
@@ -24,8 +22,7 @@ public class ScheduledImportsMessageHandler implements MessageHandler<ScheduledI
     @Transactional
     public void handleMessage(final @NonNull ScheduledImportEvent message) {
         var importId = message.getImportId();
-        ImportEntity newImport = importRepository.findByIdAndStatus(importId.id(), ImportStatus.NEW)
-                .orElseThrow(() -> new ScheduledImportNotExistException(String.format("Import with id %s and status NEW not found", importId)));
+        ImportEntity newImport = importRepository.getNewImport(importId.id());
 
         var plugin = pluginCache.tryGetPlugin(newImport.getPluginCode())
                 .orElseThrow(() -> new ImportPluginNotFoundException(String.format("Import plugin with code %s not found", newImport.getPluginCode())));

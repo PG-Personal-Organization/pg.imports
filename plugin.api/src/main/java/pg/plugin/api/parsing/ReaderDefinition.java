@@ -1,9 +1,10 @@
 package pg.plugin.api.parsing;
 
+import lombok.NonNull;
 import org.beanio.builder.StreamBuilder;
 
 public interface ReaderDefinition {
-    String getReaderName();
+    @NonNull String getReaderName();
 
-    StreamBuilder getStreamBuilder();
+    @NonNull StreamBuilder getStreamBuilder();
 }

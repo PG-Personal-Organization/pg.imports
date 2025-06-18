@@ -1,6 +1,7 @@
 package pg.plugin.infrastructure.spring.batch;
 
 import lombok.experimental.UtilityClass;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import pg.plugin.api.data.ImportContext;
@@ -21,6 +22,7 @@ public class JobUtil {
     public static final String IMPORT_CONTEXT_KEY = "IMPORT_CONTEXT";
     public static final String KAFKA_IMPORTS_MESSAGE_STRATEGY_KEY = "KAFKA_IMPORTS_MESSAGE_STRATEGY";
     public static final String RECORDS_STORING_STRATEGY_KEY = "RECORDS_STORING_STRATEGY";
+    public static final String REJECT_REASON_KEY = "REJECT_REASON";
 
     public ImportId getImportId(final StepContribution contribution) {
         String importId = contribution.getStepExecution().getJobParameters().getString(IMPORT_ID_KEY);
@@ -53,6 +55,10 @@ public class JobUtil {
         return (ImportContext) stepExecution.getJobExecution().getExecutionContext().get(IMPORT_CONTEXT_KEY);
     }
 
+    public ImportContext getImportContext(final JobExecution jobExecution) {
+        return (ImportContext) jobExecution.getExecutionContext().get(IMPORT_CONTEXT_KEY);
+    }
+
     public void putFileId(final StepContribution contribution, final UUID fileId) {
         contribution.getStepExecution().getJobExecution().getExecutionContext().put(FILE_ID_KEY, fileId);
     }
@@ -77,8 +83,16 @@ public class JobUtil {
         contribution.getStepExecution().getJobExecution().getExecutionContext().put(RECORDS_STORING_STRATEGY_KEY, strategy);
     }
 
-    public RecordsStoringStrategy getRecordsStoringStrategy(final StepContribution contribution) {
-        return (RecordsStoringStrategy) contribution.getStepExecution().getJobExecution().getExecutionContext().get(RECORDS_STORING_STRATEGY_KEY);
+    public RecordsStoringStrategy getRecordsStoringStrategy(final StepExecution stepExecution) {
+        return (RecordsStoringStrategy) stepExecution.getExecutionContext().get(RECORDS_STORING_STRATEGY_KEY);
+    }
+
+    public String getRejectReason(final StepExecution stepExecution) {
+        return (String) stepExecution.getJobExecution().getExecutionContext().get(REJECT_REASON_KEY);
+    }
+
+    public void putRejectReason(final StepExecution stepExecution, final String reason) {
+        stepExecution.getJobExecution().getExecutionContext().put(REJECT_REASON_KEY, reason);
     }
 
 }
