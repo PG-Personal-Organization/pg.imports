@@ -20,7 +20,7 @@ public class PluginStoredRecordsWriter implements RecordsWriter {
     public @NonNull WrittenRecords write(final List<PartitionedRecord> records, final ImportContext importContext, final ImportPlugin plugin) {
         if (plugin instanceof SelfStoringRecordsPlugin<?> selfStoredPlugin) {
             var recordsWriter = selfStoredPlugin.getRecordsWriter();
-            var recordsToWrite = records.stream().map(PartitionedRecord::getImportedRecord).toList();
+            var recordsToWrite = records.stream().map(PartitionedRecord::getParsedRecord).toList();
             log.info("Writing:{} records of type: {} to plugin {} storage", recordsToWrite.size(), plugin.getRecordClass(), plugin.getClass().getName());
             return recordsWriter.writeRecords(recordsToWrite, importContext);
         }

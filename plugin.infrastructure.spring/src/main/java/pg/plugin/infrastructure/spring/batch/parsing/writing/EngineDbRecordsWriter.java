@@ -31,7 +31,7 @@ public class EngineDbRecordsWriter implements RecordsWriter {
         log.info("Writing {} records of type: {} to import database storage", records.size(), plugin.getRecordClass());
         // TODO verify if batchObjectMapper is better serializer for dynamic data in recordData
         var recordsToWrite = records.stream().map(partitionedRecord -> {
-            var importedRecord = partitionedRecord.getImportedRecord();
+            var importedRecord = partitionedRecord.getParsedRecord();
             return RecordEntity.builder()
                     .importId(importedRecord.getImportId())
                     .recordStatus(importedRecord.getRecordStatus())

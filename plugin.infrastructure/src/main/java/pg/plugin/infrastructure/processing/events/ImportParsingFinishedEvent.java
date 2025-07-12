@@ -11,6 +11,6 @@ import pg.plugin.api.data.ImportId;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @AllArgsConstructor(staticName = "of")
-public class ProcessingFinishedImportEvent extends Message {
+public class ImportParsingFinishedEvent extends Message {
     private final ImportId importId;
 }

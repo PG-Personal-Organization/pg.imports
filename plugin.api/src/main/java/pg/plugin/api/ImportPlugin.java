@@ -1,9 +1,11 @@
 package pg.plugin.api;
 
 import lombok.NonNull;
-import pg.plugin.api.data.ImportedRecord;
 import pg.plugin.api.data.PluginCode;
 import pg.plugin.api.errors.NotImplementedException;
+import pg.plugin.api.importing.ImportingComponentsProvider;
+import pg.plugin.api.importing.ImportingRecordsProvider;
+import pg.plugin.api.parsing.ParsedRecord;
 import pg.plugin.api.parsing.ParsingComponentsProvider;
 import pg.plugin.api.strategies.db.RecordData;
 
@@ -28,8 +30,14 @@ public interface ImportPlugin<RECORD_DATA extends RecordData> {
     }
 
     @NonNull
-    default <IN, OUT extends ImportedRecord<RECORD_DATA>> ParsingComponentsProvider<RECORD_DATA, IN, OUT> getParsingComponentProvider() {
-        throw new NotImplementedException("Parsing implemented for plugin: " + getCode());
+    default <IN, OUT extends ParsedRecord<RECORD_DATA>> ParsingComponentsProvider<RECORD_DATA, IN, OUT> getParsingComponentProvider() {
+        throw new NotImplementedException("Parsing not implemented for plugin: " + getCode());
+    }
+
+    @NonNull
+    default <RECORD extends RecordData, IN extends ParsedRecord<RecordData>, IN_PROVIDER extends ImportingRecordsProvider<IN>>
+    ImportingComponentsProvider<RECORD, IN, IN_PROVIDER> getImportingComponentsProvider() {
+        throw new NotImplementedException("Importing not implemented for plugin: " + getCode());
     }
 
     Class<? extends RecordData> getRecordClass();

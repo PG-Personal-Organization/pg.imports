@@ -1,4 +1,6 @@
 package pg.plugin.api.strategies.db;
 
-public interface RecordData {
+import java.io.Serializable;
+
+public interface RecordData extends Serializable {
 }

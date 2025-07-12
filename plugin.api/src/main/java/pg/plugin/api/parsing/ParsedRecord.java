@@ -1,10 +1,12 @@
-package pg.plugin.api.data;
+package pg.plugin.api.parsing;
 
+import pg.plugin.api.data.ImportRecordStatus;
 import pg.plugin.api.strategies.db.RecordData;
 
+import java.io.Serializable;
 import java.util.List;
 
-public interface ImportedRecord<T extends RecordData> {
+public interface ParsedRecord<T extends RecordData> extends Serializable {
     T getRecord();
 
     String getImportId();

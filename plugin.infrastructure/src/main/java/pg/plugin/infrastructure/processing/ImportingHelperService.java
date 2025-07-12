@@ -14,7 +14,7 @@ import pg.plugin.infrastructure.persistence.imports.ImportFactory;
 import pg.plugin.infrastructure.plugins.ImportPluginNotFoundException;
 import pg.plugin.infrastructure.plugins.PluginCache;
 import pg.plugin.infrastructure.processing.errors.ImportFileNotFoundException;
-import pg.plugin.infrastructure.processing.events.ScheduledImportEvent;
+import pg.plugin.infrastructure.processing.events.ScheduledImportParsingEvent;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -48,7 +48,7 @@ public class ImportingHelperService implements ImportingHelper {
         var importEntity = ImportFactory.createScheduledImport(importPlugin, fileId, null);
         var importId = new ImportId(importEntity.getId());
 
-        eventSender.sendEvent(ScheduledImportEvent.of(importId));
+        eventSender.sendEvent(ScheduledImportParsingEvent.of(importId));
         return importId;
     }
 

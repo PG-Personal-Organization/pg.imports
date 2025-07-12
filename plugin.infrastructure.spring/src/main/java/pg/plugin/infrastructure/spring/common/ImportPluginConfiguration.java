@@ -11,6 +11,7 @@ import pg.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
 import pg.plugin.infrastructure.spring.kafka.KafkaConfiguration;
 import pg.plugin.infrastructure.spring.persistence.DatabaseConfiguration;
 
+// TODO separate configuration per USER & BATCH profiles
 @ConditionalOnProperty(value = "pg.imports.enabled", havingValue = "true")
 @Import({
         BatchConfiguration.class,

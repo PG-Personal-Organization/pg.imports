@@ -9,18 +9,18 @@ import pg.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.plugin.infrastructure.plugins.ImportPluginNotFoundException;
 import pg.plugin.infrastructure.plugins.PluginCache;
-import pg.plugin.infrastructure.processing.events.ScheduledImportEvent;
+import pg.plugin.infrastructure.processing.events.ScheduledImportParsingEvent;
 
 @Log4j2
 @RequiredArgsConstructor
-public class ScheduledImportsMessageHandler implements MessageHandler<ScheduledImportEvent> {
+public class ScheduledImportParsingMessageHandler implements MessageHandler<ScheduledImportParsingEvent> {
     private final ImportRepository importRepository;
     private final ParsingJobLauncher parsingJobLauncher;
     private final PluginCache pluginCache;
 
     @Override
     @Transactional
-    public void handleMessage(final @NonNull ScheduledImportEvent message) {
+    public void handleMessage(final @NonNull ScheduledImportParsingEvent message) {
         var importId = message.getImportId();
         ImportEntity newImport = importRepository.getNewImport(importId.id());
 
@@ -34,7 +34,7 @@ public class ScheduledImportsMessageHandler implements MessageHandler<ScheduledI
     }
 
     @Override
-    public Class<ScheduledImportEvent> getMessageType() {
-        return ScheduledImportEvent.class;
+    public Class<ScheduledImportParsingEvent> getMessageType() {
+        return ScheduledImportParsingEvent.class;
     }
 }

@@ -10,7 +10,6 @@ import pg.plugin.api.data.ImportContext;
 import pg.plugin.api.data.ImportRecordStatus;
 import pg.plugin.api.records.writing.WrittenRecords;
 import pg.plugin.api.strategies.RecordsStoringStrategy;
-import pg.plugin.infrastructure.persistence.records.db.RecordEntity;
 import pg.plugin.infrastructure.persistence.records.mongo.MongoRecordRepository;
 import pg.plugin.infrastructure.persistence.records.mongo.RecordDocument;
 import pg.plugin.infrastructure.spring.batch.parsing.processor.PartitionedRecord;
@@ -34,7 +33,7 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
     public @NonNull WrittenRecords write(final List<PartitionedRecord> records, final ImportContext importContext, final ImportPlugin plugin) {
         log.info("Writing {} records of type: {} to import mongo storage", records.size(), plugin.getRecordClass());
         var recordsToWrite = records.stream().map(partitionedRecord -> {
-            var importedRecord = partitionedRecord.getImportedRecord();
+            var importedRecord = partitionedRecord.getParsedRecord();
             try {
                 return RecordDocument.builder()
                         .importId(importedRecord.getImportId())

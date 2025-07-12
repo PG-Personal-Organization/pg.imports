@@ -71,7 +71,11 @@ public class ParsingConfiguration {
                                                  final Job localParallelParsingJob,
 //                                                 final Job distributedParallelParsingJob,
                                                  final Job distributedParsingJob) {
-        return new ConfigurationBasedParsingJobLauncher(importsConfigProvider, jobLauncher, localParsingJob, localParallelParsingJob, null,
+        return new ConfigurationBasedParsingJobLauncher(importsConfigProvider,
+                jobLauncher,
+                localParsingJob,
+                localParallelParsingJob,
+                null,
                 distributedParsingJob);
     }
 

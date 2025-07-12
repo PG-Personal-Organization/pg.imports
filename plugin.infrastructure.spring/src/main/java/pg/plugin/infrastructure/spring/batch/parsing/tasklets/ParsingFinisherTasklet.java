@@ -15,7 +15,7 @@ import pg.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.plugin.infrastructure.persistence.records.ImportRecordsEntity;
 import pg.plugin.infrastructure.persistence.records.RecordsRepository;
-import pg.plugin.infrastructure.processing.events.ProcessingFinishedImportEvent;
+import pg.plugin.infrastructure.processing.events.ImportParsingFinishedEvent;
 import pg.plugin.infrastructure.processing.events.RejectImportParsingEvent;
 import pg.plugin.infrastructure.spring.batch.JobUtil;
 
@@ -52,7 +52,7 @@ public class ParsingFinisherTasklet implements Tasklet {
             return RepeatStatus.FINISHED;
         }
 
-        eventSender.sendEvent(ProcessingFinishedImportEvent.of(parsingImport.getImportId()));
+        eventSender.sendEvent(ImportParsingFinishedEvent.of(parsingImport.getImportId()));
         log.info("Import parsing {} finished", parsingImport);
         return RepeatStatus.FINISHED;
     }

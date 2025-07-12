@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @ToString
-public class ImportEntity implements NewImport, InParsingImport, AfterParsingImport, RejectedImport, Import {
+public class ImportEntity implements NewImport, InParsingImport, AfterParsingImport, RejectedImport, InImportingImport, ImportingCompletedImport, Import {
     @Id
     private String id;
 
@@ -100,6 +100,27 @@ public class ImportEntity implements NewImport, InParsingImport, AfterParsingImp
     public AfterParsingImport finishParsing() {
         this.status = ImportStatus.PARSING_FINISHED;
         this.endedParsingOn = LocalDateTime.now();
+        return this;
+    }
+
+    @Override
+    public ImportingCompletedImport finishImporting() {
+        this.status = ImportStatus.COMPLETED;
+        this.finishedImportingOn = LocalDateTime.now();
+        return this;
+    }
+
+    @Override
+    public RejectedImport rejectImporting(final String reason) {
+        this.status = ImportStatus.IMPORTING_FAILED;
+        this.rejectedReason = reason;
+        return this;
+    }
+
+    @Override
+    public InImportingImport startImporting() {
+        this.startedImportingOn = LocalDateTime.now();
+        this.status = ImportStatus.ONGOING_IMPORTING;
         return this;
     }
 }

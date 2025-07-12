@@ -17,4 +17,14 @@ public interface ImportRepository extends JpaRepository<ImportEntity, String> {
         return findByIdAndStatus(id, ImportStatus.ONGOING_PARSING)
                 .orElseThrow(() -> new ImportNotExistsException("Import in parsing with id " + id + " not found."));
     }
+
+    default ImportEntity getParsedImport(final String id) {
+        return findByIdAndStatus(id, ImportStatus.PARSING_FINISHED)
+                .orElseThrow(() -> new ImportNotExistsException("Import in parsing with id " + id + " not found."));
+    }
+
+    default ImportEntity getImportingImport(final String id) {
+        return findByIdAndStatus(id, ImportStatus.ONGOING_IMPORTING)
+                .orElseThrow(() -> new ImportNotExistsException("Import in parsing with id " + id + " not found."));
+    }
 }
