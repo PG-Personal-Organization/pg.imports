@@ -13,9 +13,9 @@ import pg.plugin.api.ImportPlugin;
 import pg.plugin.api.data.ImportId;
 import pg.plugin.api.data.PluginCode;
 import pg.plugin.infrastructure.importing.ImportingJobLauncher;
-import pg.plugin.infrastructure.spring.batch.JobUtil;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
-import pg.plugin.infrastructure.states.AfterParsingImport;
+import pg.plugin.infrastructure.states.OngoingImportingImport;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -25,28 +25,27 @@ public class ConfigurationBasedImportingJobLauncher implements ImportingJobLaunc
 
     private final Job localImportingJob;
     private final Job localParallelImportingJob;
-    private final Job distributedParallelImportingJob;
     private final Job distributedImportingJob;
 
     @Override
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Transactional(propagation = Propagation.NEVER)
-    public void launchImportingJob(final ImportPlugin importPlugin, final AfterParsingImport afterParsingImport) {
+    public void launchImportingJob(final ImportPlugin importPlugin, final OngoingImportingImport afterParsingImport) {
         try {
             JobExecution jobExecution;
             final var defaultJobParameters = defaultJobParameters(afterParsingImport.getImportId(), afterParsingImport.getPluginCode());
             switch (importsConfigProvider.getImportingStrategy()) {
                 case LOCAL -> {
                     jobExecution = jobLauncher.run(localImportingJob, defaultJobParameters);
-                    log.info("LocalParsingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
+                    log.info("LocalImportingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
                 }
                 case LOCAL_PARALLEL -> {
                     jobExecution = jobLauncher.run(localParallelImportingJob, defaultJobParameters);
-                    log.info("LocalParallelParsingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
+                    log.info("LocalParallelImportingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
                 }
                 case DISTRIBUTED -> {
                     jobExecution = jobLauncher.run(distributedImportingJob, defaultJobParameters);
-                    log.info("DistributedParsingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
+                    log.info("DistributedImportingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
                 }
                 default -> throw new IllegalArgumentException("Unknown importing strategy: " + importsConfigProvider.getImportingStrategy());
             }

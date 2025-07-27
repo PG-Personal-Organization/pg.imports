@@ -1,4 +1,4 @@
-package pg.plugin.infrastructure.spring.batch.parsing.distributed;
+package pg.plugin.infrastructure.spring.batch.importing.distributed;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import pg.kafka.consumer.MessageHandler;
 
 @Log4j2
 @RequiredArgsConstructor
-public class DistributedChunkResponseHandler implements MessageHandler<ImportChunkMessageResponse> {
+public class DistributedImportChunkResponseHandler implements MessageHandler<ImportChunkMessageResponse> {
     private final PollableChannel responseChannel;
 
     @Override

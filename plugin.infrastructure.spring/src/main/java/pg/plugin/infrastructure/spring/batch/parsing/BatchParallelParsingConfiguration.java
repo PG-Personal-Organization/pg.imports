@@ -27,7 +27,7 @@ import pg.plugin.api.parsing.ReaderOutputItem;
 import pg.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.plugin.infrastructure.plugins.PluginCache;
-import pg.plugin.infrastructure.spring.batch.JobUtil;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.plugin.infrastructure.spring.batch.parsing.listeners.ParsingErrorJobListener;
 import pg.plugin.infrastructure.spring.batch.parsing.listeners.SimpleParsingExecutionErrorListener;
 import pg.plugin.infrastructure.spring.batch.parsing.processor.PartitionedRecord;

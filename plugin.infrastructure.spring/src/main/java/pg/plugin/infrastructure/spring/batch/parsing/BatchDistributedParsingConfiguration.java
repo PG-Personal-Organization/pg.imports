@@ -34,7 +34,7 @@ import pg.plugin.api.parsing.ReaderOutputItem;
 import pg.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.plugin.infrastructure.plugins.PluginCache;
-import pg.plugin.infrastructure.spring.batch.JobUtil;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.plugin.infrastructure.spring.batch.parsing.distributed.*;
 import pg.plugin.infrastructure.spring.batch.parsing.listeners.DistributedParsingErrorStepListener;
 import pg.plugin.infrastructure.spring.batch.parsing.listeners.ParsingErrorJobListener;
@@ -69,7 +69,7 @@ public class BatchDistributedParsingConfiguration {
         var applicationName = environment.getProperty("spring.application.name");
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-request-processing-batch-topic"))
-                .messageClass(ImportChunkMessageRequest.class)
+                .messageClass(ParseChunkMessageRequest.class)
                 .build();
     }
 
@@ -78,7 +78,7 @@ public class BatchDistributedParsingConfiguration {
         var applicationName = environment.getProperty("spring.application.name");
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-response-processing-batch-topic"))
-                .messageClass(ImportChunkMessageResponse.class)
+                .messageClass(ParseChunkMessageResponse.class)
                 .build();
     }
 
@@ -93,10 +93,10 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
-    public IntegrationFlow outboundFlow(final DistributedChunkSender distributedChunkSender) {
+    public IntegrationFlow outboundFlow(final DistributedParseChunkSender distributedParseChunkSender) {
         return IntegrationFlow
                 .from(requests())
-                .handle(distributedChunkSender)
+                .handle(distributedParseChunkSender)
                 .get();
     }
 
@@ -110,18 +110,18 @@ public class BatchDistributedParsingConfiguration {
 
     @Bean
     @StepScope
-    public DistributedChunkSender distributedChunkSender(final @Value("#{stepExecution.jobExecution.jobId}") long jobId) {
-        return new DistributedChunkSender(eventSender, jobId);
+    public DistributedParseChunkSender distributedChunkSender(final @Value("#{stepExecution.jobExecution.jobId}") long jobId) {
+        return new DistributedParseChunkSender(eventSender, jobId);
     }
 
     @Bean
-    public DistributedChunkRequestHandler distributedChunkHandler() {
-        return new DistributedChunkRequestHandler(distributedChunkItemWriter(null), distributedItemProcessor(null), eventSender);
+    public DistributedParseChunkRequestHandler distributedChunkHandler() {
+        return new DistributedParseChunkRequestHandler(distributedChunkItemWriter(null), distributedItemProcessor(null), eventSender);
     }
 
     @Bean
-    public DistributedChunkResponseHandler distributedChunkResponseHandler() {
-        return new DistributedChunkResponseHandler(replies());
+    public DistributedParseChunkResponseHandler distributedChunkResponseHandler() {
+        return new DistributedParseChunkResponseHandler(replies());
     }
 
     @Bean

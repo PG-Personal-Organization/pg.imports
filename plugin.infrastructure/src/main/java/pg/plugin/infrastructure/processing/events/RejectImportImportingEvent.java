@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import pg.kafka.message.Message;
 import pg.plugin.api.data.ImportId;
+import pg.plugin.api.data.PluginCode;
 
 import java.util.List;
 
@@ -15,20 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor(staticName = "of")
 public class RejectImportImportingEvent extends Message {
     private final ImportId importId;
+    private final PluginCode pluginCode;
     private final String reason;
-    private List<String> recordIds;
-
-    public static RejectImportImportingEvent of(final ImportId importId, final String reason) {
-        return new RejectImportImportingEvent(importId, reason);
-    }
-
-    public static RejectImportImportingEvent of(final ImportId importId, final String reason, final List<String> recordIds) {
-        return new RejectImportImportingEvent(importId, reason, recordIds);
-    }
-
-    @SuppressWarnings("checkstyle:HiddenField")
-    private RejectImportImportingEvent(final ImportId importId, final String reason, final List<String> recordIds) {
-        this(importId, reason);
-        this.recordIds = recordIds;
-    }
+    private final List<String> recordIds;
 }

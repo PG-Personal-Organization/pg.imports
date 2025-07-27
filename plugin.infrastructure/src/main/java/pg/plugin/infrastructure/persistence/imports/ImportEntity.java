@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @ToString
-public class ImportEntity implements NewImport, InParsingImport, AfterParsingImport, RejectedImport, InImportingImport, ImportingCompletedImport, Import {
+public class ImportEntity implements NewImport, OngoingParsingImport, ParsingCompletedImport, RejectedImport, OngoingImportingImport, ImportingCompletedImport, Import {
     @Id
     private String id;
 
@@ -72,7 +72,7 @@ public class ImportEntity implements NewImport, InParsingImport, AfterParsingImp
     }
 
     @Override
-    public InParsingImport startParsing() {
+    public OngoingParsingImport startParsing() {
         this.status = ImportStatus.ONGOING_PARSING;
         this.startedParsingOn = LocalDateTime.now();
         return this;
@@ -97,7 +97,7 @@ public class ImportEntity implements NewImport, InParsingImport, AfterParsingImp
     }
 
     @Override
-    public AfterParsingImport finishParsing() {
+    public ParsingCompletedImport finishParsing() {
         this.status = ImportStatus.PARSING_FINISHED;
         this.endedParsingOn = LocalDateTime.now();
         return this;
@@ -105,7 +105,7 @@ public class ImportEntity implements NewImport, InParsingImport, AfterParsingImp
 
     @Override
     public ImportingCompletedImport finishImporting() {
-        this.status = ImportStatus.COMPLETED;
+        this.status = ImportStatus.IMPORTING_COMPLETED;
         this.finishedImportingOn = LocalDateTime.now();
         return this;
     }
@@ -118,7 +118,7 @@ public class ImportEntity implements NewImport, InParsingImport, AfterParsingImp
     }
 
     @Override
-    public InImportingImport startImporting() {
+    public OngoingImportingImport startImporting() {
         this.startedImportingOn = LocalDateTime.now();
         this.status = ImportStatus.ONGOING_IMPORTING;
         return this;

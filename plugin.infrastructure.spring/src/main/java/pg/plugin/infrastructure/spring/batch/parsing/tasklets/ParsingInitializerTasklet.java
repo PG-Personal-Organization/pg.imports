@@ -14,10 +14,10 @@ import pg.plugin.api.data.PluginCode;
 import pg.plugin.api.strategies.RecordsStoringStrategy;
 import pg.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.plugin.infrastructure.persistence.imports.ImportRepository;
-import pg.plugin.infrastructure.spring.batch.JobUtil;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
 import pg.plugin.infrastructure.spring.common.config.KafkaImportsMessageStrategy;
-import pg.plugin.infrastructure.states.InParsingImport;
+import pg.plugin.infrastructure.states.OngoingParsingImport;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class ParsingInitializerTasklet implements Tasklet {
 
     @Override
     @Transactional
-    public RepeatStatus execute(final @NonNull StepContribution contribution, @NonNull final ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(final @NonNull StepContribution contribution, @NonNull final ChunkContext chunkContext) {
         ImportId importId = JobUtil.getImportId(contribution);
         ImportEntity scheduledImport = importRepository.getParsingImport(importId.id());
         PluginCode pluginCode = JobUtil.getPluginCode(contribution);
@@ -35,15 +35,15 @@ public class ParsingInitializerTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    private void storeParameters(final @NonNull PluginCode pluginCode, final StepContribution contribution, final InParsingImport inParsingImport) {
+    private void storeParameters(final @NonNull PluginCode pluginCode, final StepContribution contribution, final OngoingParsingImport ongoingParsingImport) {
         KafkaImportsMessageStrategy kafkaImportsMessageStrategy = importsConfigProvider.getKafkaMessage(pluginCode);
         RecordsStoringStrategy recordsStoringStrategy = importsConfigProvider.getRecordsStoring(pluginCode);
         log.info("KafkaImportsMessageStrategy: {}, RecordsStoringStrategy: {} resolved for import: {}",
-                kafkaImportsMessageStrategy, recordsStoringStrategy, inParsingImport.getImportId());
+                kafkaImportsMessageStrategy, recordsStoringStrategy, ongoingParsingImport.getImportId());
         JobUtil.putKafkaImportsMessageStrategy(contribution, kafkaImportsMessageStrategy);
         JobUtil.putRecordsStoringStrategy(contribution, recordsStoringStrategy);
-        JobUtil.putFileId(contribution, inParsingImport.getFileId());
-        JobUtil.putImportContext(contribution, ImportContext.of(inParsingImport.getImportId(), pluginCode, inParsingImport.getFileId()));
+        JobUtil.putFileId(contribution, ongoingParsingImport.getFileId());
+        JobUtil.putImportContext(contribution, ImportContext.of(ongoingParsingImport.getImportId(), pluginCode, ongoingParsingImport.getFileId()));
     }
 
 }

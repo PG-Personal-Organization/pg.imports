@@ -13,9 +13,9 @@ import pg.plugin.api.data.ImportId;
 import pg.plugin.api.ImportPlugin;
 import pg.plugin.api.data.PluginCode;
 import pg.plugin.infrastructure.parsing.ParsingJobLauncher;
-import pg.plugin.infrastructure.spring.batch.JobUtil;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
-import pg.plugin.infrastructure.states.InParsingImport;
+import pg.plugin.infrastructure.states.OngoingParsingImport;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -25,32 +25,26 @@ public class ConfigurationBasedParsingJobLauncher implements ParsingJobLauncher 
 
     private final Job localParsingJob;
     private final Job localParallelParsingJob;
-    private final Job distributedParallelParsingJob;
     private final Job distributedParsingJob;
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Transactional(propagation = Propagation.NEVER)
-    public void launchParsingJob(final ImportPlugin importPlugin, final InParsingImport inParsingImport) {
+    public void launchParsingJob(final ImportPlugin importPlugin, final OngoingParsingImport ongoingParsingImport) {
         try {
             JobExecution jobExecution;
-            final var defaultJobParameters = defaultJobParameters(inParsingImport.getImportId(), inParsingImport.getPluginCode());
+            final var defaultJobParameters = defaultJobParameters(ongoingParsingImport.getImportId(), ongoingParsingImport.getPluginCode());
             switch (importsConfigProvider.getParsingStrategy()) {
                 case LOCAL -> {
                     jobExecution = jobLauncher.run(localParsingJob, defaultJobParameters);
-                    log.info("LocalParsingJob launched with importId={} and content={}.", inParsingImport.getImportId(), jobExecution);
+                    log.info("LocalParsingJob launched with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
                 case LOCAL_PARALLEL -> {
                     jobExecution = jobLauncher.run(localParallelParsingJob, defaultJobParameters);
-                    log.info("LocalParallelParsingJob launched with importId={} and content={}.", inParsingImport.getImportId(), jobExecution);
+                    log.info("LocalParallelParsingJob launched with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
-// TODO
-//                case DISTRIBUTED_PARALLEL -> {
-//                    jobExecution = jobLauncher.run(distributedParallelParsingJob, defaultJobParameters);
-//                    log.info("DistributedParallelParsingJob launched with importId={} and content={}.", inParsingImport.getImportId(), jobExecution);
-//                }
                 case DISTRIBUTED -> {
                     jobExecution = jobLauncher.run(distributedParsingJob, defaultJobParameters);
-                    log.info("DistributedParsingJob launched with importId={} and content={}.", inParsingImport.getImportId(), jobExecution);
+                    log.info("DistributedParsingJob launched with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
                 default -> throw new IllegalArgumentException("Unknown parsing strategy: " + importsConfigProvider.getParsingStrategy());
             }

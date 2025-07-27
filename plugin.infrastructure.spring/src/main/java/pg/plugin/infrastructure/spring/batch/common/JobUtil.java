@@ -1,4 +1,4 @@
-package pg.plugin.infrastructure.spring.batch;
+package pg.plugin.infrastructure.spring.batch.common;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.batch.core.JobExecution;

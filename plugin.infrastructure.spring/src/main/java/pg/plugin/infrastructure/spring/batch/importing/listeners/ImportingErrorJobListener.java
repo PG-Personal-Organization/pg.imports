@@ -6,15 +6,15 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import pg.kafka.sender.EventSender;
 import pg.plugin.api.rejection.reason.ImportRejectionReasons;
-import pg.plugin.infrastructure.persistence.records.ImportRecordsEntity;
 import pg.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.plugin.infrastructure.processing.events.RejectImportImportingEvent;
-import pg.plugin.infrastructure.spring.batch.JobUtil;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -33,8 +33,11 @@ public class ImportingErrorJobListener implements JobExecutionListener {
             var importContext = JobUtil.getImportContext(jobExecution);
             log.info("Import {} rejected with reason {}, description: {}", importContext.getImportId(), reason, jobExecution.getExitStatus().getExitDescription());
             var recordsPartitions = recordsRepository.findAllByParentImportId(importContext.getImportId());
-            var recordsIds = recordsPartitions.stream().map(ImportRecordsEntity::getErrorRecordIds).flatMap(Collection::stream).toList();
-            eventSender.sendEvent(RejectImportImportingEvent.of(importContext.getImportId(), reason, recordsIds));
+            var recordsIds = recordsPartitions.stream()
+                    .map(importRecordsEntity -> Stream.concat(importRecordsEntity.getRecordIds().stream(), importRecordsEntity.getErrorRecordIds().stream()).toList())
+                    .flatMap(Collection::stream)
+                    .toList();
+            eventSender.sendEvent(RejectImportImportingEvent.of(importContext.getImportId(), importContext.getPluginCode(), reason, recordsIds));
         } catch (final Exception e) {
             log.error("Error during job execution", e);
             throw new RuntimeException(e);

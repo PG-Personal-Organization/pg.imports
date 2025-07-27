@@ -1,6 +1,9 @@
-package pg.plugin.infrastructure.spring.batch.parsing.distributed;
+package pg.plugin.infrastructure.spring.batch.importing.distributed;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.batch.integration.chunk.ChunkRequest;
 import pg.kafka.message.Message;
 

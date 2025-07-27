@@ -7,5 +7,5 @@ public enum ImportStatus {
     ONGOING_IMPORTING,
     PARSING_FAILED,
     IMPORTING_FAILED,
-    COMPLETED,
+    IMPORTING_COMPLETED,
 }

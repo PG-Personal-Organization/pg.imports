@@ -7,7 +7,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
 import pg.plugin.api.parsing.ReaderOutputItem;
 import pg.plugin.infrastructure.plugins.PluginCache;
-import pg.plugin.infrastructure.spring.batch.JobUtil;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 
 @Log4j2
 @RequiredArgsConstructor

@@ -9,7 +9,7 @@ import pg.plugin.api.rejection.reason.ImportRejectionReasons;
 import pg.plugin.infrastructure.persistence.records.ImportRecordsEntity;
 import pg.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.plugin.infrastructure.processing.events.RejectImportParsingEvent;
-import pg.plugin.infrastructure.spring.batch.JobUtil;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 
 import java.util.Collection;
 import java.util.Map;

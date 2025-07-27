@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ImportingRecordsProvider<RECORD extends ParsedRecord<RecordData>> {
 
-    List<RECORD> getRecords();
+    List<RECORD> getRecords(List<String> recordIds);
 }

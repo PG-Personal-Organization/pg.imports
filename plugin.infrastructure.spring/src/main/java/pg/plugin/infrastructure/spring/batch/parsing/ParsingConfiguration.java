@@ -1,4 +1,4 @@
-package pg.plugin.infrastructure.spring.batch;
+package pg.plugin.infrastructure.spring.batch.parsing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ import pg.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.plugin.infrastructure.persistence.records.db.RecordRepository;
 import pg.plugin.infrastructure.persistence.records.mongo.MongoRecordRepository;
 import pg.plugin.infrastructure.plugins.PluginCache;
-import pg.plugin.infrastructure.spring.batch.parsing.*;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.plugin.infrastructure.spring.batch.parsing.readers.BeanIoReader;
 import pg.plugin.infrastructure.spring.batch.parsing.tasklets.ParsingFinisherTasklet;
 import pg.plugin.infrastructure.spring.batch.parsing.tasklets.ParsingInitializerTasklet;
@@ -69,13 +69,11 @@ public class ParsingConfiguration {
                                                  final JobLauncher jobLauncher,
                                                  final Job localParsingJob,
                                                  final Job localParallelParsingJob,
-//                                                 final Job distributedParallelParsingJob,
                                                  final Job distributedParsingJob) {
         return new ConfigurationBasedParsingJobLauncher(importsConfigProvider,
                 jobLauncher,
                 localParsingJob,
                 localParallelParsingJob,
-                null,
                 distributedParsingJob);
     }
 

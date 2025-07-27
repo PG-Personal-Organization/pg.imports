@@ -16,7 +16,7 @@ import pg.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.plugin.infrastructure.persistence.records.ImportRecordsEntity;
 import pg.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.plugin.infrastructure.plugins.PluginCache;
-import pg.plugin.infrastructure.spring.batch.JobUtil;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.plugin.infrastructure.spring.batch.parsing.processor.PartitionedRecord;
 
 import java.util.List;

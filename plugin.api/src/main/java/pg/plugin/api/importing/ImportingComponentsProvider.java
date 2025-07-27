@@ -11,6 +11,11 @@ public interface ImportingComponentsProvider<RECORD extends RecordData, IN exten
 
     @NonNull
     default RecordsImportingErrorHandler getRecordsImportingErrorHandler() {
-        return (recordIds) -> { };
+        return recordIds -> { };
+    }
+
+    @NonNull
+    default CompletedImportingCleaner getCompletedImportingCleaner() {
+        return (recordIds, errorRecordIds) -> { };
     }
 }

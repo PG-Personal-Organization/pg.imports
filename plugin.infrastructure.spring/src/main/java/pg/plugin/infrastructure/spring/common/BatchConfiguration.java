@@ -14,8 +14,8 @@ import pg.plugin.api.ImportPlugin;
 import pg.plugin.api.service.ImportingHelper;
 import pg.plugin.infrastructure.plugins.PluginCache;
 import pg.plugin.infrastructure.processing.ImportingHelperService;
-import pg.plugin.infrastructure.spring.batch.ImportingConfiguration;
-import pg.plugin.infrastructure.spring.batch.ParsingConfiguration;
+import pg.plugin.infrastructure.spring.batch.importing.ImportingConfiguration;
+import pg.plugin.infrastructure.spring.batch.parsing.ParsingConfiguration;
 
 import java.util.List;
 
