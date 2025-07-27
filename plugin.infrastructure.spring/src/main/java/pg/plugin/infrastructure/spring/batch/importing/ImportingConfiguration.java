@@ -1,5 +1,6 @@
 package pg.plugin.infrastructure.spring.batch.importing;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -17,10 +18,14 @@ import pg.kafka.sender.EventSender;
 import pg.plugin.infrastructure.importing.ImportingJobLauncher;
 import pg.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.plugin.infrastructure.persistence.records.db.RecordRepository;
+import pg.plugin.infrastructure.persistence.records.mongo.MongoRecordRepository;
 import pg.plugin.infrastructure.plugins.PluginCache;
-//import pg.plugin.infrastructure.spring.batch.importing.error.ImportingErrorHandler;
+import pg.plugin.infrastructure.spring.batch.importing.readers.LibraryJsonImportingRecordsProvider;
+import pg.plugin.infrastructure.spring.batch.importing.readers.MongoImportingRecordsProvider;
 import pg.plugin.infrastructure.spring.batch.importing.tasklets.ImportingFinisherTasklet;
 import pg.plugin.infrastructure.spring.batch.importing.tasklets.ImportingInitializerTasklet;
+import pg.plugin.infrastructure.spring.batch.importing.tasklets.ImportingTasklet;
 import pg.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
 
 @Import({
@@ -48,7 +53,7 @@ public class ImportingConfiguration {
                                                      final Job localImportingJob,
                                                      final Job localParallelImportingJob,
                                                      final Job distributedImportingJob
-                                                     ) {
+    ) {
         return new ConfigurationBasedImportingJobLauncher(importsConfigProvider,
                 jobLauncher,
                 localImportingJob,
@@ -59,6 +64,13 @@ public class ImportingConfiguration {
     @Bean
     public Tasklet importingInitializerTasklet() {
         return new ImportingInitializerTasklet(importRepository, importsConfigProvider);
+    }
+
+    @Bean
+    public Tasklet importingTasklet(final PluginCache pluginCache,
+                                    final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider,
+                                    final MongoImportingRecordsProvider mongoRecordsProvider) {
+        return new ImportingTasklet(importRepository, pluginCache, recordsRepository, dbJsonRecordsProvider, mongoRecordsProvider);
     }
 
     @Bean
@@ -84,6 +96,16 @@ public class ImportingConfiguration {
                 .tasklet(importingFinisherTasklet, transactionManager)
                 .transactionAttribute(transactionAttribute)
                 .build();
+    }
+
+    @Bean
+    public LibraryJsonImportingRecordsProvider dbJsonRecordsProvider(final RecordRepository recordRepository) {
+        return new LibraryJsonImportingRecordsProvider(recordRepository);
+    }
+
+    @Bean
+    public MongoImportingRecordsProvider mongoRecordsProvider(final MongoRecordRepository recordRepository, final ObjectMapper batchObjectMapper) {
+        return new MongoImportingRecordsProvider(recordRepository, batchObjectMapper);
     }
 
 //    @Bean

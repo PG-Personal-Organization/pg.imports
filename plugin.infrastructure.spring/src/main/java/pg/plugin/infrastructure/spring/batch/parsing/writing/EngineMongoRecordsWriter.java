@@ -40,6 +40,7 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
                         .recordStatus(importedRecord.getRecordStatus())
                         .ordinal(Math.toIntExact(importedRecord.getOrdinal()))
                         .recordData(batchObjectMapper.writeValueAsString(importedRecord.getRecord()))
+                        .recordDataClass(plugin.getRecordClass())
                         .partitionId(partitionedRecord.getPartitionId())
                         .errorMessages(String.join("\n", importedRecord.getErrorMessages()))
                         .build();

@@ -15,6 +15,8 @@ import pg.plugin.infrastructure.persistence.records.ImportRecordsEntity;
 import pg.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.plugin.infrastructure.plugins.PluginCache;
 import pg.plugin.infrastructure.spring.batch.common.JobUtil;
+import pg.plugin.infrastructure.spring.batch.importing.readers.LibraryJsonImportingRecordsProvider;
+import pg.plugin.infrastructure.spring.batch.importing.readers.MongoImportingRecordsProvider;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -26,8 +28,11 @@ public class ImportingTasklet implements Tasklet {
     private final ImportRepository importRepository;
     private final PluginCache pluginCache;
     private final RecordsRepository recordsRepository;
+    private final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider;
+    private final MongoImportingRecordsProvider mongoRecordsProvider;
 
     @Override
+    @SuppressWarnings("unchecked")
     public RepeatStatus execute(final @NonNull StepContribution contribution, final @NonNull ChunkContext chunkContext) throws Exception {
         log.info("ImportingTasklet started");
         var importContext = JobUtil.getImportContext(contribution.getStepExecution());
@@ -73,8 +78,8 @@ public class ImportingTasklet implements Tasklet {
         var recordsToImport = recordsPartitions.stream().map(ImportRecordsEntity::getRecordIds).flatMap(Collection::stream).toList();
         return switch (strategy) {
             case PLUGIN_DATABASE -> plugin.getImportingComponentsProvider().getImportingRecordsProvider(recordsToImport);
-            case LIBRARY_JSON_DATABASE -> null;
-            case MONGO_REPOSITORY -> null;
+            case LIBRARY_JSON_DATABASE -> dbJsonRecordsProvider;
+            case MONGO_REPOSITORY -> mongoRecordsProvider;
         };
     }
 }

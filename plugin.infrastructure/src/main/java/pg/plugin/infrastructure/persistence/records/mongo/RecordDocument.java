@@ -31,6 +31,8 @@ public class RecordDocument {
     */
     private String recordData;
 
+    private Class<?> recordDataClass;
+
     @Field(name = "record_status")
     private ImportRecordStatus recordStatus;
 
