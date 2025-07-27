@@ -1,0 +1,16 @@
+pg:
+  kafka:
+    enabled: true
+#    bootstrap-server: localhost:9092
+logging:
+  level:
+    pg:
+      kafka: debug
+    org:
+      apache:
+        zookeeper: ERROR
+        kafka: WARN
+    kafka: WARN
+    state:
+      change:
+        logger: ERROR
