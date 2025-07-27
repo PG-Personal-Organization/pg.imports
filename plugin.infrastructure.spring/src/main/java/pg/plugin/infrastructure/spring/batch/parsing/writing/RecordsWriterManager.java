@@ -63,7 +63,8 @@ public class RecordsWriterManager implements ItemWriter<PartitionedRecord> {
                     chunk.getItems().getFirst().getPartitionId(),
                     records.recordIds(),
                     records.errorRecordIds(),
-                    records.errorMessages()
+                    records.errorMessages(),
+                    recordsStoringStrategy
             );
             recordsRepository.save(recordsEntity);
         } catch (Exception e) {

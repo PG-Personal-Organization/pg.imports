@@ -3,6 +3,7 @@ package pg.plugin.infrastructure.persistence.records;
 
 import jakarta.persistence.*;
 import lombok.*;
+import pg.plugin.api.strategies.RecordsStoringStrategy;
 import pg.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.plugin.infrastructure.states.OngoingParsingImport;
 
@@ -47,6 +48,9 @@ public class ImportRecordsEntity {
     @ToString.Exclude
     private ImportEntity parent;
 
+    @Enumerated(EnumType.STRING)
+    private RecordsStoringStrategy strategy;
+
     @Override
     public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -56,19 +60,22 @@ public class ImportRecordsEntity {
         return count == that.count && errorCount == that.errorCount && Objects.equals(id, that.id) && Objects.equals(partitionNumber, that.partitionNumber)
                 && Objects.equals(finishedParsingOn, that.finishedParsingOn) && Objects.equals(startedImportingOn, that.startedImportingOn)
                 && Objects.equals(finishedImportingOn, that.finishedImportingOn) && Objects.equals(recordIds, that.recordIds)
-                && Objects.equals(errorRecordIds, that.errorRecordIds) && Objects.equals(errorMessages, that.errorMessages) && Objects.equals(parent, that.parent);
+                && Objects.equals(errorRecordIds, that.errorRecordIds) && Objects.equals(errorMessages, that.errorMessages) && Objects.equals(parent, that.parent)
+                && Objects.equals(strategy, that.strategy);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, partitionNumber, finishedParsingOn, startedImportingOn, finishedImportingOn, recordIds, errorRecordIds, count, errorCount, errorMessages, parent);
+        return Objects.hash(id, partitionNumber, finishedParsingOn, startedImportingOn, finishedImportingOn, recordIds, errorRecordIds, count, errorCount, errorMessages, parent,
+                strategy);
     }
 
     public static ImportRecordsEntity from(final OngoingParsingImport parsingImport,
                                            final String partitionNumber,
                                            final List<String> recordIds,
                                            final List<String> errorRecordIds,
-                                           final Map<String, String> errorMessages) {
+                                           final Map<String, String> errorMessages,
+                                           final RecordsStoringStrategy strategy) {
         return ImportRecordsEntity.builder()
                 .id(String.format("IMP_REC_%s_%s", parsingImport.getImportId(), partitionNumber))
                 .parent((ImportEntity) parsingImport)
@@ -79,6 +86,7 @@ public class ImportRecordsEntity {
                 .count(recordIds.size())
                 .errorCount(errorRecordIds.size())
                 .finishedParsingOn(LocalDateTime.now())
+                .strategy(strategy)
                 .build();
     }
 }
