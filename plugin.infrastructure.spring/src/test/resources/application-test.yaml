@@ -1,0 +1,46 @@
+# ===========================================
+# Spring Application Configuration
+# ===========================================
+spring:
+  # H2 Database Configuration (In-Memory)
+  datasource:
+    url: jdbc:h2:mem:application_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  
+  # JPA/Hibernate Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  
+  # MongoDB Configuration
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/application_mongodb
+
+# ===========================================
+# Application Specific Configuration
+# ===========================================
+pg:
+  kafka:
+    enabled: true
+    # bootstrap-server: localhost:9092
+
+# ===========================================
+# Logging Configuration
+# ===========================================
+logging:
+  level:
+    pg:
+      kafka: debug
+    org:
+      apache:
+        zookeeper: ERROR
+        kafka: WARN
+    kafka: WARN
+    state:
+      change:
+        logger: ERROR

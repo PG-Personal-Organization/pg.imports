@@ -14,6 +14,11 @@
 	<name>plugin.infrastructure.spring</name>
 	<description>Import plugins infrastructure</description>
 
+    <properties>
+        <hypersistence.version>3.7.0</hypersistence.version>
+        <embedded-mongo.version>4.12.0</embedded-mongo.version>
+    </properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.pg</groupId>
@@ -91,6 +96,23 @@
 			<artifactId>junit-jupiter-api</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+        <dependency>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-62</artifactId>
+            <version>${hypersistence.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <version>${embedded-mongo.version}</version>
+            <scope>test</scope>
+        </dependency>
 
 	</dependencies>
 
