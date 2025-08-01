@@ -25,7 +25,7 @@ public class ReaderOutputItemProcessor implements ItemProcessor<ReaderOutputItem
 
         try {
             log.info("Processing item: {}", item);
-            var parsedRecord = recordParser.parse(item);
+            var parsedRecord = recordParser.parse(item, importContext);
             log.info("Parsed item: {}", parsedRecord);
             return PartitionedRecord.of(parsedRecord, item.getPartitionId(), item.getChunkNumber());
         } catch (final Exception e) {

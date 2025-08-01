@@ -30,7 +30,7 @@ public interface ImportPlugin<RECORD_DATA extends RecordData> {
     }
 
     @NonNull
-    default <IN, OUT extends ParsedRecord<RECORD_DATA>> ParsingComponentsProvider<RECORD_DATA, IN, OUT> getParsingComponentProvider() {
+    default <OUT extends ParsedRecord<RECORD_DATA>> ParsingComponentsProvider<RECORD_DATA, OUT> getParsingComponentProvider() {
         throw new NotImplementedException("Parsing not implemented for plugin: " + getCode());
     }
 

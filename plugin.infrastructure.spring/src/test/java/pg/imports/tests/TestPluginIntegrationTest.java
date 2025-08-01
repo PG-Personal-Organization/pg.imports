@@ -1,5 +1,6 @@
 package pg.imports.tests;
 
+import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import pg.imports.tests.data.TestRecordParser;
 import pg.plugin.api.data.ImportRecordStatus;
 import pg.plugin.api.importing.ImportingComponentsProvider;
 import pg.plugin.api.importing.ImportingRecordsProvider;
+import pg.plugin.api.parsing.BeanIoReaderDefinition;
 import pg.plugin.api.parsing.ParsedRecord;
 import pg.plugin.api.parsing.ReaderDefinition;
 import pg.plugin.api.parsing.RecordsParsingErrorHandler;
@@ -39,7 +41,12 @@ class TestPluginIntegrationTest {
         importId = UUID.randomUUID().toString();
         recordParser = new TestRecordParser();
 
-        ReaderDefinition readerDefinition = new ReaderDefinition();
+        ReaderDefinition readerDefinition = new BeanIoReaderDefinition() {
+            @Override
+            public @NonNull String getReaderName() {
+                return "TEST";
+            }
+        };
         RecordsParsingErrorHandler errorHandler = recordIds -> {};
 
         TestParsingComponentsProvider parsingProvider = new TestParsingComponentsProvider(

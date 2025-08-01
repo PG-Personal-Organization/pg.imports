@@ -10,16 +10,16 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @ToString(callSuper = true)
-public class ReadOnlyParsedRecord implements ParsedRecord<RecordData> {
+public class ReadOnlyParsedRecord<R extends RecordData> implements ParsedRecord<R> {
     private String importId;
     private String id;
-    private RecordData recordData;
+    private R recordData;
     private int ordinal;
     private ImportRecordStatus recordStatus;
     private List<String> errorMessages;
 
     @Override
-    public RecordData getRecord() {
+    public R getRecord() {
         return recordData;
     }
 

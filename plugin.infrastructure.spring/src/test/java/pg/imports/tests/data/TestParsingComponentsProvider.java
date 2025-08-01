@@ -9,9 +9,9 @@ import pg.plugin.api.parsing.RecordsParsingErrorHandler;
 import pg.plugin.api.parsing.ParsingComponentsProvider;
 
 @RequiredArgsConstructor
-public class TestParsingComponentsProvider implements ParsingComponentsProvider<TestRecordData, String, ReadOnlyParsedRecord> {
+public class TestParsingComponentsProvider implements ParsingComponentsProvider<TestRecordData, ReadOnlyParsedRecord<TestRecordData>> {
 
-    private final RecordParser<String, TestRecordData, ReadOnlyParsedRecord> recordParser;
+    private final RecordParser<TestRecordData, ReadOnlyParsedRecord<TestRecordData>> recordParser;
     private final ReaderDefinition readerDefinition;
     private final RecordsParsingErrorHandler errorHandler;
 
@@ -23,7 +23,7 @@ public class TestParsingComponentsProvider implements ParsingComponentsProvider<
 
     @NonNull
     @Override
-    public RecordParser<String, TestRecordData, ReadOnlyParsedRecord> getRecordParser() {
+    public RecordParser<TestRecordData, ReadOnlyParsedRecord<TestRecordData>> getRecordParser() {
         return recordParser;
     }
 
