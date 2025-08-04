@@ -3,6 +3,7 @@ package pg.plugin.infrastructure.spring.batch.importing.readers;
 import lombok.RequiredArgsConstructor;
 import pg.plugin.api.importing.ImportingRecordsProvider;
 import pg.plugin.api.parsing.ReadOnlyParsedRecord;
+import pg.plugin.api.strategies.db.RecordData;
 import pg.plugin.infrastructure.persistence.records.db.RecordEntity;
 import pg.plugin.infrastructure.persistence.records.db.RecordRepository;
 
@@ -10,11 +11,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class LibraryJsonImportingRecordsProvider implements ImportingRecordsProvider<ReadOnlyParsedRecord> {
+public class LibraryJsonImportingRecordsProvider implements ImportingRecordsProvider<ReadOnlyParsedRecord<RecordData>> {
     private final RecordRepository recordRepository;
 
     @Override
-    public List<ReadOnlyParsedRecord> getRecords(final List<String> recordIds) {
+    public List<ReadOnlyParsedRecord<RecordData>> getRecords(final List<String> recordIds) {
         List<UUID> uuidIds = recordIds.stream()
                 .map(UUID::fromString)
                 .toList();
@@ -30,7 +31,7 @@ public class LibraryJsonImportingRecordsProvider implements ImportingRecordsProv
                 .toList();
     }
 
-    private ReadOnlyParsedRecord toParsedRecord(final RecordEntity recordEntity) {
+    private ReadOnlyParsedRecord<RecordData> toParsedRecord(final RecordEntity recordEntity) {
         return ReadOnlyParsedRecord.builder()
                 .importId(recordEntity.getImportId())
                 .id(recordEntity.getId().toString())

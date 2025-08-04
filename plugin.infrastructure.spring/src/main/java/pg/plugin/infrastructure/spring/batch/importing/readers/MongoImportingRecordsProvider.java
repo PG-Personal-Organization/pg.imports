@@ -13,13 +13,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class MongoImportingRecordsProvider implements ImportingRecordsProvider<ReadOnlyParsedRecord> {
+public class MongoImportingRecordsProvider implements ImportingRecordsProvider<ReadOnlyParsedRecord<RecordData>> {
     private final MongoRecordRepository recordRepository;
     private final ObjectMapper batchObjectMapper;
 
     @Override
     @SneakyThrows
-    public List<ReadOnlyParsedRecord> getRecords(final List<String> recordIds) {
+    public List<ReadOnlyParsedRecord<RecordData>> getRecords(final List<String> recordIds) {
         var uuidIds = recordIds.stream()
                 .map(UUID::fromString)
                 .toList();
@@ -36,7 +36,7 @@ public class MongoImportingRecordsProvider implements ImportingRecordsProvider<R
     }
 
     @SneakyThrows
-    private ReadOnlyParsedRecord toParsedRecord(final RecordDocument recordDocument) {
+    private ReadOnlyParsedRecord<RecordData> toParsedRecord(final RecordDocument recordDocument) {
         return ReadOnlyParsedRecord.builder()
                 .importId(recordDocument.getImportId())
                 .id(recordDocument.getId().toString())

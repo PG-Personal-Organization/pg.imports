@@ -18,10 +18,6 @@ public class RejectImportParsingEvent extends Message {
     private final String reason;
     private List<String> recordIds;
 
-    public static RejectImportParsingEvent of(final ImportId importId, final String reason) {
-        return new RejectImportParsingEvent(importId, reason);
-    }
-
     public static RejectImportParsingEvent of(final ImportId importId, final String reason, final List<String> recordIds) {
         return new RejectImportParsingEvent(importId, reason, recordIds);
     }

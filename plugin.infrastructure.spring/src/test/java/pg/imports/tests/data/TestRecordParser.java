@@ -3,17 +3,18 @@ package pg.imports.tests.data;
 import lombok.NonNull;
 import pg.plugin.api.data.ImportContext;
 import pg.plugin.api.data.ImportRecordStatus;
+import pg.plugin.api.parsing.ParsedRecord;
 import pg.plugin.api.parsing.ReadOnlyParsedRecord;
 import pg.plugin.api.parsing.ReaderOutputItem;
 import pg.plugin.api.parsing.RecordParser;
 
 import java.util.Collections;
 
-public class TestRecordParser implements RecordParser<TestRecord, ReadOnlyParsedRecord<TestRecord>> {
+public class TestRecordParser implements RecordParser<TestRecord, ParsedRecord<TestRecord>> {
 
     @Override
     @NonNull
-    public ReadOnlyParsedRecord<TestRecord> parse(final ReaderOutputItem<Object> item, final ImportContext importContext) {
+    public ParsedRecord<TestRecord> parse(final ReaderOutputItem<Object> item, final ImportContext importContext) {
             var importId = importContext.getImportId();
         try {
             TestRecord data = (TestRecord) item.getRawItem();

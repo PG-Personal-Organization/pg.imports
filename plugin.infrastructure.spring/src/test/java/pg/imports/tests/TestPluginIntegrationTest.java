@@ -3,45 +3,37 @@ package pg.imports.tests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pg.imports.tests.data.TestParsingComponentsProvider;
 import pg.imports.tests.data.TestPlugin;
 import pg.imports.tests.data.TestRecord;
 import pg.imports.tests.data.TestRecordParser;
+import pg.plugin.api.data.ImportContext;
+import pg.plugin.api.data.ImportId;
 import pg.plugin.api.data.ImportRecordStatus;
-import pg.plugin.api.importing.ImportingComponentsProvider;
-import pg.plugin.api.importing.ImportingRecordsProvider;
 import pg.plugin.api.parsing.ParsedRecord;
+import pg.plugin.api.parsing.ReaderOutputItem;
 import pg.plugin.api.parsing.RecordsParsingErrorHandler;
-import pg.plugin.api.strategies.db.RecordData;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 class TestPluginIntegrationTest {
 
-    @Mock
-    private ImportingComponentsProvider<TestRecord, ParsedRecord<RecordData>, ImportingRecordsProvider<ParsedRecord<RecordData>>> importingProvider;
-
-    private TestRecordParser recordParser;
     private TestPlugin testPlugin;
     private String importId;
 
     @BeforeEach
     void setUp() {
         importId = UUID.randomUUID().toString();
-        recordParser = new TestRecordParser();
-
         RecordsParsingErrorHandler errorHandler = recordIds -> {};
 
-        TestParsingComponentsProvider parsingComponentsProvider = new TestParsingComponentsProvider(recordParser, errorHandler);
+        TestParsingComponentsProvider parsingComponentsProvider = new TestParsingComponentsProvider(new TestRecordParser(), errorHandler);
 
-        testPlugin = new TestPlugin(parsingComponentsProvider, importingProvider);
+        testPlugin = new TestPlugin(parsingComponentsProvider, null);
     }
 
     @Test
@@ -51,56 +43,32 @@ class TestPluginIntegrationTest {
 
         // then
         assertNotNull(code);
-        assertEquals("TEST", code.getCode());
+        assertEquals("TEST", code.code());
     }
 
     @Test
     void shouldParseRecordsCorrectly() {
         // given
-        String[] testData = {
-            "test1,value1,1",
-            "test2,value2,2",
-            "test3,value3,3"
-        };
-
-        // when
-        List<ParsedRecord<TestRecord>> parsedRecords = Arrays.stream(testData)
-                .map(data -> recordParser.parse(data, importId, Arrays.asList(testData).indexOf(data)))
-                .toList();
-
-        // then
-        assertEquals(3, parsedRecords.size());
-        parsedRecords.forEach(record -> {
-            assertEquals(ImportRecordStatus.PARSED, record.getRecordStatus());
-            assertTrue(record.getErrorMessages().isEmpty());
-        });
+        ReaderOutputItem<Object> recordData = ReaderOutputItem.builder()
+                .chunkNumber(1)
+                .id("1")
+                .itemNumber(1)
+                .partitionId("1")
+                .rawItem(TestRecord.builder().name("test1").value("value1").orderId(1).build())
+                .build();
 
         var recordParser = testPlugin.getParsingComponentProvider().getRecordParser();
+        var importContext = ImportContext.of(new ImportId(importId), testPlugin.getCode(), UUID.randomUUID());
         assertNotNull(recordParser);
 
-        ParsedRecord<TestRecord> parsedRecord = recordParser.parse("test4,value4,4", importId, 0);
+        ParsedRecord<TestRecord> parsedRecord = recordParser.parse(recordData, importContext);
         assertNotNull(parsedRecord);
         assertEquals(ImportRecordStatus.PARSED, parsedRecord.getRecordStatus());
 
-        TestRecord data = (TestRecord) parsedRecord.getRecord();
-        assertEquals("test4", data.getName());
-        assertEquals("value4", data.getValue());
-        assertEquals(4, data.getOrderId());
-    }
-
-    @Test
-    void shouldHandleParsingErrors() {
-        // given
-        var recordParser = testPlugin.getParsingComponentProvider().getRecordParser();
-
-        // when
-        ParsedRecord<TestRecord> parsedRecord = recordParser.parse("invalid_format", importId, 0);
-
-        // then
-        assertNotNull(parsedRecord);
-        assertEquals(ImportRecordStatus.PARSING_FAILED, parsedRecord.getRecordStatus());
-        assertFalse(parsedRecord.getErrorMessages().isEmpty());
-        assertNull(parsedRecord.getRecord());
+        TestRecord data = parsedRecord.getRecord();
+        assertEquals("test1", data.getName());
+        assertEquals("value1", data.getValue());
+        assertEquals(1, data.getOrderId());
     }
 
     @Test

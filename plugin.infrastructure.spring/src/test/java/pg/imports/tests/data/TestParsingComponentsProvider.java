@@ -7,9 +7,9 @@ import org.beanio.builder.StreamBuilder;
 import pg.plugin.api.parsing.*;
 
 @RequiredArgsConstructor
-public class TestParsingComponentsProvider implements ParsingComponentsProvider<TestRecord, ReadOnlyParsedRecord<TestRecord>> {
+public class TestParsingComponentsProvider implements ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> {
 
-    private final RecordParser<TestRecord, ReadOnlyParsedRecord<TestRecord>> recordParser;
+    private final RecordParser<TestRecord, ParsedRecord<TestRecord>> recordParser;
     private final RecordsParsingErrorHandler errorHandler;
 
     @NonNull
@@ -27,7 +27,7 @@ public class TestParsingComponentsProvider implements ParsingComponentsProvider<
 
     @NonNull
     @Override
-    public RecordParser<TestRecord, ReadOnlyParsedRecord<TestRecord>> getRecordParser() {
+    public RecordParser<TestRecord, ParsedRecord<TestRecord>> getRecordParser() {
         return recordParser;
     }
 
