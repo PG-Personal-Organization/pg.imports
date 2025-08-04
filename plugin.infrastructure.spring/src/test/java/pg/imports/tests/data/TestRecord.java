@@ -12,7 +12,7 @@ import pg.plugin.api.strategies.db.RecordData;
 @NoArgsConstructor
 @AllArgsConstructor
 @org.beanio.annotation.Record
-public class TestRecordData implements RecordData {
+public class TestRecord implements RecordData {
     @Field(at = 0)
     private String name;
     @Field(at = 1)

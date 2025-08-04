@@ -11,10 +11,10 @@ import pg.plugin.api.parsing.ParsingComponentsProvider;
 import pg.plugin.api.strategies.db.RecordData;
 
 @RequiredArgsConstructor
-public class TestPlugin implements ImportPlugin<TestRecordData> {
+public class TestPlugin implements ImportPlugin<TestRecord> {
 
-    private final ParsingComponentsProvider<TestRecordData, ParsedRecord<TestRecordData>> parsingProvider;
-    private final ImportingComponentsProvider<TestRecordData, ParsedRecord<RecordData>, ImportingRecordsProvider<ParsedRecord<RecordData>>> importingProvider;
+    private final ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> parsingProvider;
+    private final ImportingComponentsProvider<TestRecord, ParsedRecord<RecordData>, ImportingRecordsProvider<ParsedRecord<RecordData>>> importingProvider;
 
     @NonNull
     @Override
@@ -41,7 +41,7 @@ public class TestPlugin implements ImportPlugin<TestRecordData> {
 
     @NonNull
     @Override
-    public ParsingComponentsProvider<TestRecordData, ParsedRecord<TestRecordData>> getParsingComponentProvider() {
+    public ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> getParsingComponentProvider() {
         return parsingProvider;
     }
 
@@ -54,6 +54,6 @@ public class TestPlugin implements ImportPlugin<TestRecordData> {
 
     @Override
     public Class<? extends RecordData> getRecordClass() {
-        return TestRecordData.class;
+        return TestRecord.class;
     }
 }

@@ -9,15 +9,15 @@ import pg.plugin.api.parsing.RecordParser;
 
 import java.util.Collections;
 
-public class TestRecordParser implements RecordParser<TestRecordData, ReadOnlyParsedRecord<TestRecordData>> {
+public class TestRecordParser implements RecordParser<TestRecord, ReadOnlyParsedRecord<TestRecord>> {
 
     @Override
     @NonNull
-    public ReadOnlyParsedRecord<TestRecordData> parse(final ReaderOutputItem<Object> item, final ImportContext importContext) {
+    public ReadOnlyParsedRecord<TestRecord> parse(final ReaderOutputItem<Object> item, final ImportContext importContext) {
             var importId = importContext.getImportId();
         try {
-            TestRecordData data = (TestRecordData) item.getRawItem();
-            return ReadOnlyParsedRecord.<TestRecordData>builder()
+            TestRecord data = (TestRecord) item.getRawItem();
+            return ReadOnlyParsedRecord.<TestRecord>builder()
                     .importId(importId.id())
                     .recordData(data)
                     .ordinal(item.getItemNumber())
@@ -25,7 +25,7 @@ public class TestRecordParser implements RecordParser<TestRecordData, ReadOnlyPa
                     .errorMessages(Collections.emptyList())
                     .build();
         } catch (final Exception e) {
-            return ReadOnlyParsedRecord.<TestRecordData>builder()
+            return ReadOnlyParsedRecord.<TestRecord>builder()
                     .importId(importId.id())
                     .recordData(null)
                     .ordinal(item.getItemNumber())

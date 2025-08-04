@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import pg.imports.tests.data.TestRecordData;
+import pg.imports.tests.data.TestRecord;
 import pg.imports.tests.data.TestRecordParser;
 import pg.plugin.api.data.ImportRecordStatus;
 import pg.plugin.api.parsing.ParsedRecord;
@@ -42,7 +42,7 @@ class TestRecordParserTest {
         assertEquals(importId, record.getImportId());
         assertEquals(1L, record.getOrdinal());
 
-        TestRecordData data = (TestRecordData) record.getRecord();
+        TestRecord data = (TestRecord) record.getRecord();
         assertEquals("nazwa", data.getName());
         assertEquals("wartość", data.getValue());
         assertEquals(123, data.getOrderId());
