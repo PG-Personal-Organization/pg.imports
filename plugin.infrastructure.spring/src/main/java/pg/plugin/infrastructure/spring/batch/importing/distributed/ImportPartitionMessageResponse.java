@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.springframework.batch.integration.chunk.ChunkResponse;
+import org.springframework.batch.core.StepExecution;
 import pg.kafka.message.Message;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString
 @Data
 @AllArgsConstructor
-public class ImportChunkMessageResponse extends Message {
-    private final ChunkResponse response;
+public class ImportPartitionMessageResponse extends Message {
+    private final StepExecution stepExecution;
 }

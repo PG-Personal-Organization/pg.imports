@@ -1,10 +1,8 @@
 package pg.plugin.infrastructure.spring.batch.importing.tasklets;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import pg.plugin.api.ImportPlugin;
@@ -24,24 +22,14 @@ import java.util.List;
 
 @Log4j2
 @RequiredArgsConstructor
-public class ImportingTasklet implements Tasklet {
-    private final ImportRepository importRepository;
-    private final PluginCache pluginCache;
-    private final RecordsRepository recordsRepository;
+public abstract class ImportingTasklet implements Tasklet {
+    protected final ImportRepository importRepository;
+    protected final PluginCache pluginCache;
+    protected final RecordsRepository recordsRepository;
     private final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider;
     private final MongoImportingRecordsProvider mongoRecordsProvider;
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public RepeatStatus execute(final @NonNull StepContribution contribution, final @NonNull ChunkContext chunkContext) throws Exception {
-        log.info("ImportingTasklet started");
-        var importContext = JobUtil.getImportContext(contribution.getStepExecution());
-        var importId = importContext.getImportId();
-
-        importRepository.getImportingImport(importId.id());
-        var plugin = pluginCache.getPlugin(importContext.getPluginCode());
-
-        var recordsPartitions = recordsRepository.findAllByParentImportId(importId);
+    protected RepeatStatus execute(final List<ImportRecordsEntity> recordsPartitions, final ImportPlugin plugin, final StepContribution contribution) {
         var storingStrategy = recordsPartitions.stream().map(ImportRecordsEntity::getStrategy).findFirst().orElseThrow();
 
         var importRecordsProvider = resolveProvider(storingStrategy, plugin, recordsPartitions);

@@ -1,0 +1,40 @@
+package pg.plugin.infrastructure.spring.batch.importing.tasklets;
+
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.repeat.RepeatStatus;
+import pg.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.plugin.infrastructure.plugins.PluginCache;
+import pg.plugin.infrastructure.spring.batch.common.JobUtil;
+import pg.plugin.infrastructure.spring.batch.importing.readers.LibraryJsonImportingRecordsProvider;
+import pg.plugin.infrastructure.spring.batch.importing.readers.MongoImportingRecordsProvider;
+
+@Log4j2
+public class SimpleImportingTasklet extends ImportingTasklet {
+
+    public SimpleImportingTasklet(final ImportRepository importRepository,
+                                  final PluginCache pluginCache,
+                                  final RecordsRepository recordsRepository,
+                                  final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider,
+                                  final MongoImportingRecordsProvider mongoRecordsProvider) {
+        super(importRepository, pluginCache, recordsRepository, dbJsonRecordsProvider, mongoRecordsProvider);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public RepeatStatus execute(final @NonNull StepContribution contribution, final @NonNull ChunkContext chunkContext) {
+        log.info("SimpleImportingTasklet started");
+        var importContext = JobUtil.getImportContext(contribution.getStepExecution());
+        var importId = importContext.getImportId();
+
+        importRepository.getImportingImport(importId.id());
+        var plugin = pluginCache.getPlugin(importContext.getPluginCode());
+
+        var recordsPartitions = recordsRepository.findAllByParentImportId(importId);
+        return execute(recordsPartitions, plugin, contribution);
+    }
+
+}

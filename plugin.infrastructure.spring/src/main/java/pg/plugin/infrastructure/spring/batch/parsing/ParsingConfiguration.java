@@ -49,8 +49,7 @@ import java.io.InputStream;
 @Import({
         BatchLocalParsingConfiguration.class,
         BatchParallelParsingConfiguration.class,
-        BatchDistributedParsingConfiguration.class,
-        BatchDistributedParallelParsingConfiguration.class
+        BatchDistributedParsingConfiguration.class
 })
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

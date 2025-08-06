@@ -65,7 +65,7 @@ public class BatchDistributedParsingConfiguration {
     private final List<RecordsWriter> recordsWriters;
 
     @Bean
-    public MessageDestination importChunkMessageRequestDestination() {
+    public MessageDestination parsingChunkMessageRequestDestination() {
         var applicationName = environment.getProperty("spring.application.name");
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-request-processing-batch-topic"))
@@ -74,7 +74,7 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
-    public MessageDestination importChunkMessageResponseDestination() {
+    public MessageDestination parsingChunkMessageResponseDestination() {
         var applicationName = environment.getProperty("spring.application.name");
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-response-processing-batch-topic"))
@@ -83,28 +83,28 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
-    public MessageChannel requests() {
+    public MessageChannel parsingRequests() {
         return new DirectChannel();
     }
 
     @Bean
-    public PollableChannel replies() {
+    public PollableChannel parsingReplies() {
         return new QueueChannel();
     }
 
     @Bean
-    public IntegrationFlow outboundFlow(final DistributedParseChunkSender distributedParseChunkSender) {
+    public IntegrationFlow parsingOutboundFlow(final DistributedParseChunkSender distributedParseChunkSender) {
         return IntegrationFlow
-                .from(requests())
+                .from(parsingRequests())
                 .handle(distributedParseChunkSender)
                 .get();
     }
 
     @Bean
-    public IntegrationFlow inboundReplies() {
+    public IntegrationFlow parsingInboundReplies() {
         return IntegrationFlow
                 .fromSupplier(this::distributedChunkHandler)
-                .channel(replies())
+                .channel(parsingReplies())
                 .get();
     }
 
@@ -121,7 +121,7 @@ public class BatchDistributedParsingConfiguration {
 
     @Bean
     public DistributedParseChunkResponseHandler distributedChunkResponseHandler() {
-        return new DistributedParseChunkResponseHandler(replies());
+        return new DistributedParseChunkResponseHandler(parsingReplies());
     }
 
     @Bean
@@ -154,8 +154,8 @@ public class BatchDistributedParsingConfiguration {
                 .transactionAttribute(transactionAttribute)
                 .chunk(chunkSize)
                 .reader(itemReader)
-                .outputChannel(requests())
-                .inputChannel(replies())
+                .outputChannel(parsingRequests())
+                .inputChannel(parsingReplies())
                 .listener(new DistributedParsingErrorStepListener(recordsRepository));
         return new FaultTolerantStepBuilder<>(stepBuilder).build();
     }

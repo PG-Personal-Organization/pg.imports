@@ -25,7 +25,8 @@ import pg.plugin.infrastructure.spring.batch.importing.readers.LibraryJsonImport
 import pg.plugin.infrastructure.spring.batch.importing.readers.MongoImportingRecordsProvider;
 import pg.plugin.infrastructure.spring.batch.importing.tasklets.ImportingFinisherTasklet;
 import pg.plugin.infrastructure.spring.batch.importing.tasklets.ImportingInitializerTasklet;
-import pg.plugin.infrastructure.spring.batch.importing.tasklets.ImportingTasklet;
+import pg.plugin.infrastructure.spring.batch.importing.tasklets.PartitionedImportingTasklet;
+import pg.plugin.infrastructure.spring.batch.importing.tasklets.SimpleImportingTasklet;
 import pg.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
 
 @Import({
@@ -67,10 +68,13 @@ public class ImportingConfiguration {
     }
 
     @Bean
-    public Tasklet importingTasklet(final PluginCache pluginCache,
-                                    final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider,
-                                    final MongoImportingRecordsProvider mongoRecordsProvider) {
-        return new ImportingTasklet(importRepository, pluginCache, recordsRepository, dbJsonRecordsProvider, mongoRecordsProvider);
+    public Tasklet simpleImportingTasklet(final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider, final MongoImportingRecordsProvider mongoRecordsProvider) {
+        return new SimpleImportingTasklet(importRepository, pluginCache, recordsRepository, dbJsonRecordsProvider, mongoRecordsProvider);
+    }
+
+    @Bean
+    public Tasklet partitionedImportingTasklet(final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider, final MongoImportingRecordsProvider mongoRecordsProvider) {
+        return new PartitionedImportingTasklet(importRepository, pluginCache, recordsRepository, dbJsonRecordsProvider, mongoRecordsProvider);
     }
 
     @Bean
