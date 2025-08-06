@@ -32,8 +32,7 @@ import pg.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
 @Import({
         BatchLocalImportingConfiguration.class,
         BatchParallelImportingConfiguration.class,
-        BatchDistributedImportingConfiguration.class,
-        BatchDistributedParallelImportingConfiguration.class
+        BatchDistributedImportingConfiguration.class
 })
 @Configuration
 @RequiredArgsConstructor(onConstructor_ = @__(@Autowired))
