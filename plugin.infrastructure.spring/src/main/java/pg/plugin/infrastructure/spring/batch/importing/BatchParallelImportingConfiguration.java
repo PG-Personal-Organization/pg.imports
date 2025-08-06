@@ -58,7 +58,7 @@ public class BatchParallelImportingConfiguration {
         TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
         handler.setStep(parallelImportingWorkerStep());
         handler.setGridSize(corePoolSize);
-        handler.setTaskExecutor(importTaskExecutor());
+        handler.setTaskExecutor(parallelImportTaskExecutor());
         return handler;
     }
 
@@ -81,12 +81,12 @@ public class BatchParallelImportingConfiguration {
     }
 
     @Bean
-    public TaskExecutor importTaskExecutor() {
+    public TaskExecutor parallelImportTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(corePoolSize);
         executor.setMaxPoolSize(maxPoolSize);
         executor.setQueueCapacity(maxPoolSize);
-        executor.setThreadNamePrefix("importer-");
+        executor.setThreadNamePrefix("parallel-imports-importer-");
         executor.initialize();
         return executor;
     }
