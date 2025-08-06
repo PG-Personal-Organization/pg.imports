@@ -28,8 +28,8 @@ import pg.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListe
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DistributedImportingMasterConfiguration {
-    private static final String MANAGER_STEP = "distributedImportingStep";
-    private static final String WORKER_STEP = "distributedImportingWorkerStep";
+    public static final String MANAGER_STEP = "distributedImportingStep";
+    public static final String WORKER_STEP = "distributedImportingWorkerStep";
     private static final int GRID_SIZE = 6;
     private static final int POLL_MS = 3_000;
 

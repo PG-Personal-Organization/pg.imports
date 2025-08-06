@@ -21,8 +21,6 @@ import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.Imp
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DistributedImportingWorkerConfiguration {
-    private static final String IMPORTING_STEP_NAME = "distributedImportingWorkerStep";
-
     private final PlatformTransactionManager chainedTransactionManager;
     private final JobRepository jobRepository;
 
@@ -36,7 +34,7 @@ public class DistributedImportingWorkerConfiguration {
 
     @Bean
     public TaskletStep distributedImportingWorkerStep() {
-        return new StepBuilder(IMPORTING_STEP_NAME, jobRepository)
+        return new StepBuilder(DistributedImportingMasterConfiguration.WORKER_STEP, jobRepository)
                 .tasklet(partitionedImportingTasklet, chainedTransactionManager)
                 .build();
     }
