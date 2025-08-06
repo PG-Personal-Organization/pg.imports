@@ -13,11 +13,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.PollableChannel;
 import org.springframework.transaction.PlatformTransactionManager;
-import pg.plugin.infrastructure.spring.batch.importing.distributed.DistributedImportPartitionResponseSender;
-import pg.plugin.infrastructure.spring.batch.importing.distributed.ImportPartitionMessageRequest;
-import pg.plugin.infrastructure.spring.batch.importing.distributed.ImportPartitionMessageResponse;
+import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.DistributedImportPartitionResponseSender;
+import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.ImportPartitionMessageRequest;
+import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.ImportPartitionMessageResponse;
 
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

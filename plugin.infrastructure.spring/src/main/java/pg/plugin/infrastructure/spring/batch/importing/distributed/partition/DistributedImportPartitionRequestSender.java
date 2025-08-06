@@ -1,4 +1,4 @@
-package pg.plugin.infrastructure.spring.batch.importing.distributed;
+package pg.plugin.infrastructure.spring.batch.importing.distributed.partition;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

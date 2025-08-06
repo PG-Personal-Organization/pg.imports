@@ -1,4 +1,4 @@
-package pg.plugin.infrastructure.spring.batch.importing.distributed;
+package pg.plugin.infrastructure.spring.batch.importing.distributed.partition;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

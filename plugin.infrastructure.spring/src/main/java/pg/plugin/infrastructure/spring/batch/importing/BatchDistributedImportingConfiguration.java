@@ -5,6 +5,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
+import org.springframework.batch.integration.partition.StepExecutionRequestHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,9 +21,14 @@ import pg.kafka.sender.EventSender;
 import pg.kafka.topic.TopicName;
 import pg.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.plugin.infrastructure.spring.batch.common.JobUtil;
-import pg.plugin.infrastructure.spring.batch.importing.distributed.*;
 import pg.plugin.infrastructure.spring.batch.importing.distributed.config.DistributedImportingMasterConfiguration;
 import pg.plugin.infrastructure.spring.batch.importing.distributed.config.DistributedImportingWorkerConfiguration;
+import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.DistributedImportPartitionRequestSender;
+import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.DistributedImportPartitionResponseSender;
+import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.ImportPartitionMessageRequest;
+import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.ImportPartitionMessageResponse;
+import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.kafka.DistributedImportPartitionRequestMessageHandler;
+import pg.plugin.infrastructure.spring.batch.importing.distributed.partition.kafka.DistributedImportPartitionResponseMessageHandler;
 import pg.plugin.infrastructure.spring.batch.importing.partition.ImportingPartitioner;
 
 @Configuration
@@ -48,12 +54,24 @@ public class BatchDistributedImportingConfiguration {
     }
 
     @Bean
+    public DistributedImportPartitionResponseMessageHandler distributedImportPartitionResponseMessageHandler() {
+        return new DistributedImportPartitionResponseMessageHandler(importingReplies());
+    }
+
+    @Bean
     public MessageDestination parsingChunkMessageResponseDestination() {
         var applicationName = environment.getProperty("spring.application.name");
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-response-importing-batch-topic"))
                 .messageClass(ImportPartitionMessageResponse.class)
                 .build();
+    }
+
+    @Bean
+    public DistributedImportPartitionRequestMessageHandler distributedImportPartitionRequestMessageHandler(
+            final StepExecutionRequestHandler stepExecutionRequestHandler
+    ) {
+        return new DistributedImportPartitionRequestMessageHandler(eventSender, stepExecutionRequestHandler);
     }
 
     @Bean
