@@ -32,8 +32,9 @@ public class ConfigurationBasedParsingJobLauncher implements ParsingJobLauncher 
     public void launchParsingJob(final ImportPlugin importPlugin, final OngoingParsingImport ongoingParsingImport) {
         try {
             JobExecution jobExecution;
-            final var defaultJobParameters = defaultJobParameters(ongoingParsingImport.getImportId(), ongoingParsingImport.getPluginCode());
-            switch (importsConfigProvider.getParsingStrategy()) {
+            final var pluginCode = ongoingParsingImport.getPluginCode();
+            final var defaultJobParameters = defaultJobParameters(ongoingParsingImport.getImportId(), pluginCode);
+            switch (importsConfigProvider.getParsingStrategy(pluginCode)) {
                 case LOCAL -> {
                     jobExecution = jobLauncher.run(localParsingJob, defaultJobParameters);
                     log.info("LocalParsingJob launched with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
@@ -46,7 +47,7 @@ public class ConfigurationBasedParsingJobLauncher implements ParsingJobLauncher 
                     jobExecution = jobLauncher.run(distributedParsingJob, defaultJobParameters);
                     log.info("DistributedParsingJob launched with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
-                default -> throw new IllegalArgumentException("Unknown parsing strategy: " + importsConfigProvider.getParsingStrategy());
+                default -> throw new IllegalArgumentException("Unknown parsing strategy: " + importsConfigProvider.getParsingStrategy(pluginCode));
             }
         } catch (final Exception e) {
             log.error(e.getLocalizedMessage(), e);

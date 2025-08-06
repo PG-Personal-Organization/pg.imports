@@ -23,4 +23,8 @@ public class ImportsConfig {
     private Map</*PluginCode*/ String, KafkaImportsMessageStrategy> pluginsKafkaImportsMessage = new HashMap<>();
 
     private Map</*PluginCode*/ String, RecordsStoringStrategy> pluginsDatabaseRecordsStoring = new HashMap<>();
+
+    private Map</*PluginCode*/ String, ImportStrategy> pluginsImportStrategy = new HashMap<>();
+
+    private Map</*PluginCode*/ String, ImportStrategy> pluginsParsingStrategy = new HashMap<>();
 }

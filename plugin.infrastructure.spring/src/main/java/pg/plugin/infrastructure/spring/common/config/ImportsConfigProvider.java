@@ -11,18 +11,24 @@ import java.util.Optional;
 public class ImportsConfigProvider {
     private ImportsConfig importsConfig;
 
-    public ImportStrategy getParsingStrategy() {
-        return importsConfig.getParsingStrategy();
+    public ImportStrategy getParsingStrategy(final @NonNull PluginCode pluginCode) {
+        return importsConfig.getPluginsParsingStrategy().getOrDefault(
+                pluginCode.code(),
+                Optional.ofNullable(importsConfig.getParsingStrategy()).orElse(ImportStrategy.LOCAL)
+        );
     }
 
-    public ImportStrategy getImportingStrategy() {
-        return importsConfig.getImportStrategy();
+    public ImportStrategy getImportingStrategy(final @NonNull PluginCode pluginCode) {
+        return importsConfig.getPluginsImportStrategy().getOrDefault(
+          pluginCode.code(),
+          Optional.ofNullable(importsConfig.getImportStrategy()).orElse(ImportStrategy.LOCAL)
+        );
     }
 
     public KafkaImportsMessageStrategy getKafkaMessage(final @NonNull PluginCode pluginCode) {
         return importsConfig.getPluginsKafkaImportsMessage().getOrDefault(
                 pluginCode.code(),
-                Optional.ofNullable(importsConfig.getKafkaImportsMessageStrategy()).orElse(KafkaImportsMessageStrategy.FAT_RECORDS)
+                Optional.ofNullable(importsConfig.getKafkaImportsMessageStrategy()).orElse(KafkaImportsMessageStrategy.LIGHT_RECORDS)
         );
     }
 

@@ -3,7 +3,11 @@ package pg.imports.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import pg.imports.tests.data.TestParsingComponentsProvider;
+import pg.imports.tests.data.TestPlugin;
+import pg.imports.tests.data.TestRecordParser;
 import pg.lib.common.spring.config.CommonModuleConfiguration;
 
 @Import({
@@ -13,4 +17,13 @@ import pg.lib.common.spring.config.CommonModuleConfiguration;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ImportsTestConfiguration {
 
+    @Bean
+    public TestParsingComponentsProvider testParsingComponentsProvider() {
+        return new TestParsingComponentsProvider(new TestRecordParser());
+    }
+
+    @Bean
+    public TestPlugin testPlugin() {
+        return new TestPlugin(testParsingComponentsProvider(), null);
+    }
 }

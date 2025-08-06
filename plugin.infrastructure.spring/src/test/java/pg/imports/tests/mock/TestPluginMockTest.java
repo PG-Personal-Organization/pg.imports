@@ -1,4 +1,4 @@
-package pg.imports.tests;
+package pg.imports.tests.mock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import pg.plugin.api.data.ImportId;
 import pg.plugin.api.data.ImportRecordStatus;
 import pg.plugin.api.parsing.ParsedRecord;
 import pg.plugin.api.parsing.ReaderOutputItem;
-import pg.plugin.api.parsing.RecordsParsingErrorHandler;
 
 import java.util.UUID;
 
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-class TestPluginIntegrationTest {
+class TestPluginMockTest {
 
     private TestPlugin testPlugin;
     private String importId;
@@ -29,9 +28,8 @@ class TestPluginIntegrationTest {
     @BeforeEach
     void setUp() {
         importId = UUID.randomUUID().toString();
-        RecordsParsingErrorHandler errorHandler = recordIds -> {};
 
-        TestParsingComponentsProvider parsingComponentsProvider = new TestParsingComponentsProvider(new TestRecordParser(), errorHandler);
+        TestParsingComponentsProvider parsingComponentsProvider = new TestParsingComponentsProvider(new TestRecordParser());
 
         testPlugin = new TestPlugin(parsingComponentsProvider, null);
     }

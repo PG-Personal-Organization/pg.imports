@@ -47,9 +47,8 @@ public class TestPlugin implements ImportPlugin<TestRecord> {
 
     @NonNull
     @Override
-    public <RECORD extends RecordData, IN extends ParsedRecord<RecordData>, IN_PROVIDER extends ImportingRecordsProvider<IN>>
-    ImportingComponentsProvider<RECORD, IN, IN_PROVIDER> getImportingComponentsProvider() {
-        return (ImportingComponentsProvider<RECORD, IN, IN_PROVIDER>) importingProvider;
+    public ImportingComponentsProvider<TestRecord, ParsedRecord<RecordData>, ImportingRecordsProvider<ParsedRecord<RecordData>>> getImportingComponentsProvider() {
+        return importingProvider;
     }
 
     @Override

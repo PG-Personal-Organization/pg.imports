@@ -33,8 +33,9 @@ public class ConfigurationBasedImportingJobLauncher implements ImportingJobLaunc
     public void launchImportingJob(final ImportPlugin importPlugin, final OngoingImportingImport afterParsingImport) {
         try {
             JobExecution jobExecution;
-            final var defaultJobParameters = defaultJobParameters(afterParsingImport.getImportId(), afterParsingImport.getPluginCode());
-            switch (importsConfigProvider.getImportingStrategy()) {
+            final var pluginCode = afterParsingImport.getPluginCode();
+            final var defaultJobParameters = defaultJobParameters(afterParsingImport.getImportId(), pluginCode);
+            switch (importsConfigProvider.getImportingStrategy(pluginCode)) {
                 case LOCAL -> {
                     jobExecution = jobLauncher.run(localImportingJob, defaultJobParameters);
                     log.info("LocalImportingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
@@ -47,7 +48,7 @@ public class ConfigurationBasedImportingJobLauncher implements ImportingJobLaunc
                     jobExecution = jobLauncher.run(distributedImportingJob, defaultJobParameters);
                     log.info("DistributedImportingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
                 }
-                default -> throw new IllegalArgumentException("Unknown importing strategy: " + importsConfigProvider.getImportingStrategy());
+                default -> throw new IllegalArgumentException("Unknown importing strategy: " + importsConfigProvider.getImportingStrategy(pluginCode));
             }
         } catch (final Exception e) {
             log.error(e.getLocalizedMessage(), e);

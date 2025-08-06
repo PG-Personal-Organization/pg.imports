@@ -10,7 +10,6 @@ import pg.plugin.api.parsing.*;
 public class TestParsingComponentsProvider implements ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> {
 
     private final RecordParser<TestRecord, ParsedRecord<TestRecord>> recordParser;
-    private final RecordsParsingErrorHandler errorHandler;
 
     @NonNull
     @Override
@@ -29,11 +28,5 @@ public class TestParsingComponentsProvider implements ParsingComponentsProvider<
     @Override
     public RecordParser<TestRecord, ParsedRecord<TestRecord>> getRecordParser() {
         return recordParser;
-    }
-
-    @NonNull
-    @Override
-    public RecordsParsingErrorHandler getRecordsParsingErrorHandler() {
-        return errorHandler;
     }
 }

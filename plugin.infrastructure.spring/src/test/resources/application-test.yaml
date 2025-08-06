@@ -8,7 +8,12 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password: ""
-  
+  # Profiles
+  profiles:
+    default: default
+    group:
+      default: USER,BATCH,test
+
   # JPA/Hibernate Configuration
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -28,6 +33,17 @@ pg:
   kafka:
     enabled: true
     # bootstrap-server: localhost:9092
+  imports:
+    # defaults
+    import-strategy: local
+    parsing-strategy: local
+    records-storing-strategy: library_json_database
+    kafka-imports-message-strategy: light_records
+    # Plugins specific
+    plugins-import-strategy:
+      TEST: local
+    plugins-parsing-strategy:
+      TEST: local
 
 # ===========================================
 # Logging Configuration

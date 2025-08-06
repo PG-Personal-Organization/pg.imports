@@ -2,6 +2,7 @@ package pg.plugin.infrastructure.spring.kafka;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import pg.kafka.sender.EventSender;
 import pg.plugin.infrastructure.importing.CompletedImportImportingMessageHandler;
 import pg.plugin.infrastructure.importing.ImportingJobLauncher;
@@ -14,6 +15,9 @@ import pg.plugin.infrastructure.parsing.ScheduledImportParsingMessageHandler;
 import pg.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.plugin.infrastructure.plugins.PluginCache;
 
+@Import({
+        pg.kafka.config.KafkaConfiguration.class,
+})
 @Configuration
 public class KafkaConfiguration {
 
