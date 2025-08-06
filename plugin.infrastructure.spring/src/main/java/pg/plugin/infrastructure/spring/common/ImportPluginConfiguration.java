@@ -6,12 +6,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
+import pg.plugin.api.service.ImportingHelper;
 import pg.plugin.infrastructure.spring.common.config.ImportsConfig;
 import pg.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
+import pg.plugin.infrastructure.spring.delivery.http.ImportController;
 import pg.plugin.infrastructure.spring.kafka.KafkaConfiguration;
 import pg.plugin.infrastructure.spring.persistence.DatabaseConfiguration;
 
-// TODO separate configuration per USER & BATCH profiles
 @ConditionalOnProperty(value = "pg.imports.enabled", havingValue = "true")
 @Import({
         BatchConfiguration.class,
@@ -26,5 +28,11 @@ public class ImportPluginConfiguration {
     @Bean
     public ImportsConfigProvider importsConfigProvider() {
         return new ImportsConfigProvider(importsConfig);
+    }
+
+    @Bean
+    @Profile("USER")
+    public ImportController importController(final ImportingHelper importingHelper) {
+        return new ImportController(importingHelper);
     }
 }
