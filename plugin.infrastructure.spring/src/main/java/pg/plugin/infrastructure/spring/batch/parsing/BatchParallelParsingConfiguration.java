@@ -66,6 +66,7 @@ public class BatchParallelParsingConfiguration {
         ThreadPoolTaskExecutor t = new ThreadPoolTaskExecutor();
         t.setCorePoolSize(corePoolSize);
         t.setMaxPoolSize(maxPoolSize);
+        t.setQueueCapacity(maxPoolSize);
         t.setThreadNamePrefix("parallel-imports-parsing-");
         t.initialize();
         return t;
@@ -112,8 +113,8 @@ public class BatchParallelParsingConfiguration {
     }
 
     @Bean
-    public Job parallelParsingJob() {
-        return new JobBuilder("parallelParsingJob", jobRepository)
+    public Job localParallelParsingJob() {
+        return new JobBuilder("localParallelParsingJob", jobRepository)
                 .listener(new LoggingJobExecutionListener())
                 .listener(new ParsingErrorJobListener(eventSender, recordsRepository))
                 .start(initParsingStep)

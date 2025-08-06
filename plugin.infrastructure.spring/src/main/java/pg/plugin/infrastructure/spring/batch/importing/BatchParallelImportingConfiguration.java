@@ -10,19 +10,28 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import pg.plugin.infrastructure.spring.batch.importing.partition.ImportingPartitioner;
+import pg.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListener;
 
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BatchParallelImportingConfiguration {
     private static final String WORKER_STEP_NAME = "parallelImportingWorkerStep";
     private static final String PARTITIONED_STEP_NAME = "parallelImportingStep";
-    private static final int GRID_SIZE = 6; // Number of partitions/threads
+    private static final int IMPORTING_STEP_TRANSACTION_TIMEOUT = 3600;
+
+    @Value("${batch.parallel.importing.corePoolSize:4}")
+    private int corePoolSize;
+
+    @Value("${batch.parallel.importing.maxPoolSize:12}")
+    private int maxPoolSize;
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
@@ -35,8 +44,12 @@ public class BatchParallelImportingConfiguration {
 
     @Bean
     public TaskletStep parallelImportingWorkerStep() {
+        var transactionAttribute = new DefaultTransactionAttribute();
+        transactionAttribute.setTimeout(IMPORTING_STEP_TRANSACTION_TIMEOUT);
+
         return new StepBuilder(WORKER_STEP_NAME, jobRepository)
                 .tasklet(partitionedImportingTasklet, transactionManager)
+                .transactionAttribute(transactionAttribute)
                 .build();
     }
 
@@ -44,7 +57,7 @@ public class BatchParallelImportingConfiguration {
     public TaskExecutorPartitionHandler partitionHandler() {
         TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
         handler.setStep(parallelImportingWorkerStep());
-        handler.setGridSize(GRID_SIZE);
+        handler.setGridSize(corePoolSize);
         handler.setTaskExecutor(importTaskExecutor());
         return handler;
     }
@@ -60,6 +73,7 @@ public class BatchParallelImportingConfiguration {
     @Bean
     public Job localParallelImportingJob() {
         return new JobBuilder("localParallelImportingJob", jobRepository)
+                .listener(new LoggingJobExecutionListener())
                 .start(initImportingStep)
                 .next(parallelImportingStep())
                 .next(finishImportingStep)
@@ -69,9 +83,9 @@ public class BatchParallelImportingConfiguration {
     @Bean
     public TaskExecutor importTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(GRID_SIZE);
-        executor.setMaxPoolSize(GRID_SIZE);
-        executor.setQueueCapacity(GRID_SIZE);
+        executor.setCorePoolSize(corePoolSize);
+        executor.setMaxPoolSize(maxPoolSize);
+        executor.setQueueCapacity(maxPoolSize);
         executor.setThreadNamePrefix("importer-");
         executor.initialize();
         return executor;
