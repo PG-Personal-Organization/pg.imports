@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.beanio.builder.CsvParserBuilder;
 import org.beanio.builder.StreamBuilder;
-import pg.plugin.api.parsing.*;
+import pg.imports.plugin.api.parsing.*;
 
 @RequiredArgsConstructor
 public class TestParsingComponentsProvider implements ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> {

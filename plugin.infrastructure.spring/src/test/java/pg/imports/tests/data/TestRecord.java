@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.beanio.annotation.Field;
-import pg.plugin.api.strategies.db.RecordData;
+import pg.imports.plugin.api.strategies.db.RecordData;
 
 @Data
 @Builder

@@ -1,12 +1,12 @@
 package pg.imports.tests.data;
 
 import lombok.NonNull;
-import pg.plugin.api.data.ImportContext;
-import pg.plugin.api.data.ImportRecordStatus;
-import pg.plugin.api.parsing.ParsedRecord;
-import pg.plugin.api.parsing.ReadOnlyParsedRecord;
-import pg.plugin.api.parsing.ReaderOutputItem;
-import pg.plugin.api.parsing.RecordParser;
+import pg.imports.plugin.api.data.ImportContext;
+import pg.imports.plugin.api.data.ImportRecordStatus;
+import pg.imports.plugin.api.parsing.ParsedRecord;
+import pg.imports.plugin.api.parsing.ReadOnlyParsedRecord;
+import pg.imports.plugin.api.parsing.ReaderOutputItem;
+import pg.imports.plugin.api.parsing.RecordParser;
 
 import java.util.Collections;
 

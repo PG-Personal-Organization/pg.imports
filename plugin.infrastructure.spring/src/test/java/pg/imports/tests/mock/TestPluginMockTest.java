@@ -8,11 +8,11 @@ import pg.imports.tests.data.TestParsingComponentsProvider;
 import pg.imports.tests.data.TestPlugin;
 import pg.imports.tests.data.TestRecord;
 import pg.imports.tests.data.TestRecordParser;
-import pg.plugin.api.data.ImportContext;
-import pg.plugin.api.data.ImportId;
-import pg.plugin.api.data.ImportRecordStatus;
-import pg.plugin.api.parsing.ParsedRecord;
-import pg.plugin.api.parsing.ReaderOutputItem;
+import pg.imports.plugin.api.data.ImportContext;
+import pg.imports.plugin.api.data.ImportId;
+import pg.imports.plugin.api.data.ImportRecordStatus;
+import pg.imports.plugin.api.parsing.ParsedRecord;
+import pg.imports.plugin.api.parsing.ReaderOutputItem;
 
 import java.util.UUID;
 
