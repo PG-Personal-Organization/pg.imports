@@ -8,10 +8,12 @@ import org.springframework.context.annotation.Import;
 import pg.imports.tests.data.TestParsingComponentsProvider;
 import pg.imports.tests.data.TestPlugin;
 import pg.imports.tests.data.TestRecordParser;
+import pg.lib.awsfiles.infrastructure.config.InMemoryMockConfiguration;
 import pg.lib.common.spring.config.CommonModuleConfiguration;
 
 @Import({
-        CommonModuleConfiguration.class
+        CommonModuleConfiguration.class,
+        InMemoryMockConfiguration.class
 })
 @TestConfiguration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

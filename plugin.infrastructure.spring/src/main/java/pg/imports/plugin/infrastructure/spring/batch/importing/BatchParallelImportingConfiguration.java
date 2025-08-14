@@ -3,6 +3,7 @@ package pg.imports.plugin.infrastructure.spring.batch.importing;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
@@ -54,7 +55,8 @@ public class BatchParallelImportingConfiguration {
     }
 
     @Bean
-    public TaskExecutorPartitionHandler partitionHandler() {
+    @StepScope
+    public TaskExecutorPartitionHandler parallelPartitionHandler() {
         TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
         handler.setStep(parallelImportingWorkerStep());
         handler.setGridSize(corePoolSize);
@@ -66,7 +68,7 @@ public class BatchParallelImportingConfiguration {
     public Step parallelImportingStep() {
         return new StepBuilder(PARTITIONED_STEP_NAME, jobRepository)
                 .partitioner(WORKER_STEP_NAME, importingPartitioner)
-                .partitionHandler(partitionHandler())
+                .partitionHandler(parallelPartitionHandler())
                 .build();
     }
 

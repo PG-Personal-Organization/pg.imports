@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.beanio.annotation.Field;
 import pg.imports.plugin.api.strategies.db.RecordData;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,7 +18,7 @@ public class TestRecord implements RecordData {
     @Field(at = 0)
     private String name;
     @Field(at = 1)
-    private String value;
+    private BigDecimal value;
     @Field(at = 2)
     private Integer orderId;
 }

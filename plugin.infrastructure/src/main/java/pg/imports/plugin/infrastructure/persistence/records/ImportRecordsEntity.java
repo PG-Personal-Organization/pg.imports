@@ -45,6 +45,7 @@ public class ImportRecordsEntity {
     private Map</* recordId*/String, /* errorMessages*/String> errorMessages = new HashMap<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_import_id")
     @ToString.Exclude
     private ImportEntity parent;
 

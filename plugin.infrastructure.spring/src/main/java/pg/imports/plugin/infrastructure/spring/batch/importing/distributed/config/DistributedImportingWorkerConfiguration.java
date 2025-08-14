@@ -26,7 +26,7 @@ public class DistributedImportingWorkerConfiguration {
 
     private final Tasklet partitionedImportingTasklet;
     private final JobExplorer jobExplorer;
-    private final StepLocator stepLocator;
+    private final StepLocator distributedImportingJob;
 
     private final MessageChannel partitionRequestInbound;
 
@@ -43,7 +43,7 @@ public class DistributedImportingWorkerConfiguration {
     public StepExecutionRequestHandler stepExecutionRequestHandler() {
         StepExecutionRequestHandler handler = new StepExecutionRequestHandler();
         handler.setJobExplorer(jobExplorer);
-        handler.setStepLocator(stepLocator);
+        handler.setStepLocator(distributedImportingJob);
         return handler;
     }
 

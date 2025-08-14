@@ -2,12 +2,11 @@
 # Spring Application Configuration
 # ===========================================
 spring:
-  # H2 Database Configuration (In-Memory)
   datasource:
-    url: jdbc:h2:mem:application_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
   # Profiles
   profiles:
     group:
@@ -15,10 +14,13 @@ spring:
 
   # JPA/Hibernate Configuration
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create-drop
-    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
   
   # MongoDB Configuration
   data:
@@ -45,6 +47,7 @@ pg:
     enabled: true
     # bootstrap-server: localhost:9092
   imports:
+    enabled: true
     # defaults
     import-strategy: local
     parsing-strategy: local
@@ -55,6 +58,8 @@ pg:
       TEST: local
     plugins-parsing-strategy:
       TEST: local
+    pluginsDatabaseRecordsStoring:
+      TEST: library_json_database
 
 # ===========================================
 # Logging Configuration
@@ -66,8 +71,14 @@ logging:
     org:
       apache:
         zookeeper: ERROR
-        kafka: WARN
-    kafka: WARN
+        kafka: ERROR
+    kafka: ERROR
     state:
       change:
         logger: ERROR
+    de:
+      flapdoodle:
+        embed:
+          mongo:
+            spring:
+              autoconfigure: ERROR

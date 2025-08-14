@@ -1,10 +1,8 @@
 package pg.imports.plugin.infrastructure.persistence.records.db;
 
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 import pg.imports.plugin.api.data.ImportRecordStatus;
 import pg.imports.plugin.api.strategies.db.RecordData;
@@ -12,7 +10,7 @@ import pg.imports.plugin.api.strategies.db.RecordData;
 import java.util.Objects;
 import java.util.UUID;
 
-@Entity(name = "imported_records")
+@Entity(name = "records")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -33,7 +31,6 @@ public class RecordEntity {
     @Enumerated(EnumType.STRING)
     private ImportRecordStatus recordStatus;
 
-    @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")
     private RecordData recordData;

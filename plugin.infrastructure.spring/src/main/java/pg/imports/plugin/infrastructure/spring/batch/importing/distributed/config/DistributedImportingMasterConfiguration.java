@@ -52,7 +52,7 @@ public class DistributedImportingMasterConfiguration {
 
     @Bean
     @StepScope
-    public MessageChannelPartitionHandler partitionHandler() {
+    public MessageChannelPartitionHandler distributedPartitionHandler() {
         MessageChannelPartitionHandler handler = new MessageChannelPartitionHandler();
         handler.setStepName(WORKER_STEP);
         handler.setGridSize(GRID_SIZE);
@@ -67,7 +67,7 @@ public class DistributedImportingMasterConfiguration {
     public Step distributedImportingStep() {
         return new StepBuilder(MANAGER_STEP, jobRepository)
                 .partitioner(WORKER_STEP, importingPartitioner)
-                .partitionHandler(partitionHandler())
+                .partitionHandler(distributedPartitionHandler())
                 .build();
     }
 

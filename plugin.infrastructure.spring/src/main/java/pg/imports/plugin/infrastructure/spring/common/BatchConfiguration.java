@@ -37,7 +37,7 @@ public class BatchConfiguration {
         return new ImportingHelperService(pluginCache, fileService, eventSender);
     }
 
-    @Bean
+    @Bean(name = "batchObjectMapper")
     public ObjectMapper batchObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());

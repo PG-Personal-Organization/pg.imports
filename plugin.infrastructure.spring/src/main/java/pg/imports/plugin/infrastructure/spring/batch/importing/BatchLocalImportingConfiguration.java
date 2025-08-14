@@ -37,8 +37,8 @@ public class BatchLocalImportingConfiguration {
     private final EventSender eventSender;
 
     @Bean
-    public Job simpleImportingJob() {
-        return new JobBuilder("simpleImportingJob", jobRepository)
+    public Job localImportingJob() {
+        return new JobBuilder("localImportingJob", jobRepository)
                 .listener(new LoggingJobExecutionListener())
                 .listener(new ImportingErrorJobListener(eventSender, recordsRepository))
                 .start(initImportingStep)

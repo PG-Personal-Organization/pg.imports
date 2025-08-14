@@ -9,7 +9,7 @@ import pg.imports.plugin.infrastructure.spring.common.ImportPluginConfiguration;
         ImportsTestConfiguration.class,
         ImportPluginConfiguration.class,
 })
-@SpringBootApplication
+@SpringBootApplication()
 public class ImportsTestApplication {
     public static void main(String[] args) {
         SpringApplication.run(ImportsTestApplication.class, args);

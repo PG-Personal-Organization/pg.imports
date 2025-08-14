@@ -11,14 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
-import pg.kafka.message.MessageDestination;
-import pg.kafka.sender.EventSender;
-import pg.kafka.topic.TopicName;
 import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.config.DistributedImportingMasterConfiguration;
@@ -30,6 +28,9 @@ import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.parti
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition.kafka.DistributedImportPartitionRequestMessageHandler;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition.kafka.DistributedImportPartitionResponseMessageHandler;
 import pg.imports.plugin.infrastructure.spring.batch.importing.partition.ImportingPartitioner;
+import pg.kafka.message.MessageDestination;
+import pg.kafka.sender.EventSender;
+import pg.kafka.topic.TopicName;
 
 @Configuration
 @Import({
@@ -38,14 +39,14 @@ import pg.imports.plugin.infrastructure.spring.batch.importing.partition.Importi
 })
 @EnableBatchProcessing
 @EnableBatchIntegration
-@RequiredArgsConstructor(onConstructor_ = @__(@Autowired))
+@RequiredArgsConstructor(onConstructor_ = @__({@Autowired, @Lazy}))
 public class BatchDistributedImportingConfiguration {
     private final RecordsRepository recordsRepository;
     private final EventSender eventSender;
     private final Environment environment;
 
     @Bean
-    public MessageDestination parsingChunkMessageRequestDestination() {
+    public MessageDestination importingChunkMessageRequestDestination() {
         var applicationName = environment.getProperty("spring.application.name");
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-request-importing-batch-topic"))
@@ -59,7 +60,7 @@ public class BatchDistributedImportingConfiguration {
     }
 
     @Bean
-    public MessageDestination parsingChunkMessageResponseDestination() {
+    public MessageDestination importingChunkMessageResponseDestination() {
         var applicationName = environment.getProperty("spring.application.name");
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-response-importing-batch-topic"))

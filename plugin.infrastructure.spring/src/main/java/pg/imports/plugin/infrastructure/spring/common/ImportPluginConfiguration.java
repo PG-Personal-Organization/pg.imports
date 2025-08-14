@@ -12,13 +12,16 @@ import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfig;
 import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
 import pg.imports.plugin.infrastructure.spring.http.ImportController;
 import pg.imports.plugin.infrastructure.spring.kafka.KafkaConfiguration;
+import pg.imports.plugin.infrastructure.spring.mongo.MongoConfiguration;
 import pg.imports.plugin.infrastructure.spring.persistence.DatabaseConfiguration;
 
 @ConditionalOnProperty(value = "pg.imports.enabled", havingValue = "true")
 @Import({
-        BatchConfiguration.class,
         KafkaConfiguration.class,
-        DatabaseConfiguration.class
+        BatchConfiguration.class,
+        DatabaseConfiguration.class,
+        MongoConfiguration.class,
+        ImportsConfig.class
 })
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

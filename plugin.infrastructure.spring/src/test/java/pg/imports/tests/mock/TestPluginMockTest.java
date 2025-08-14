@@ -14,6 +14,7 @@ import pg.imports.plugin.api.data.ImportRecordStatus;
 import pg.imports.plugin.api.parsing.ParsedRecord;
 import pg.imports.plugin.api.parsing.ReaderOutputItem;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,7 +53,7 @@ class TestPluginMockTest {
                 .id("1")
                 .itemNumber(1)
                 .partitionId("1")
-                .rawItem(TestRecord.builder().name("test1").value("value1").orderId(1).build())
+                .rawItem(TestRecord.builder().name("test1").value(BigDecimal.valueOf(3.20)).orderId(1).build())
                 .build();
 
         var recordParser = testPlugin.getParsingComponentProvider().getRecordParser();
@@ -65,7 +66,7 @@ class TestPluginMockTest {
 
         TestRecord data = parsedRecord.getRecord();
         assertEquals("test1", data.getName());
-        assertEquals("value1", data.getValue());
+        assertEquals(BigDecimal.valueOf(3.20), data.getValue());
         assertEquals(1, data.getOrderId());
     }
 
