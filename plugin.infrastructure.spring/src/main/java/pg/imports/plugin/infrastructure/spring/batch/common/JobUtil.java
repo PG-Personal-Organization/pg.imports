@@ -60,7 +60,7 @@ public class JobUtil {
     }
 
     public void putFileId(final StepContribution contribution, final UUID fileId) {
-        contribution.getStepExecution().getJobExecution().getExecutionContext().put(FILE_ID_KEY, fileId);
+        contribution.getStepExecution().getJobExecution().getExecutionContext().put(FILE_ID_KEY, fileId.toString());
     }
 
     public UUID getFileId(final StepContribution contribution) {
@@ -84,7 +84,7 @@ public class JobUtil {
     }
 
     public RecordsStoringStrategy getRecordsStoringStrategy(final StepExecution stepExecution) {
-        return (RecordsStoringStrategy) stepExecution.getExecutionContext().get(RECORDS_STORING_STRATEGY_KEY);
+        return (RecordsStoringStrategy) stepExecution.getJobExecution().getExecutionContext().get(RECORDS_STORING_STRATEGY_KEY);
     }
 
     public String getRejectReason(final StepExecution stepExecution) {

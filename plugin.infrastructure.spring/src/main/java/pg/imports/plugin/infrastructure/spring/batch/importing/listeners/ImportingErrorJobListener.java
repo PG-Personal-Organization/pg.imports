@@ -32,7 +32,7 @@ public class ImportingErrorJobListener implements JobExecutionListener {
             var reason = getRejectReason(jobExecution);
             var importContext = JobUtil.getImportContext(jobExecution);
             log.info("Import {} rejected with reason {}, description: {}", importContext.getImportId(), reason, jobExecution.getExitStatus().getExitDescription());
-            var recordsPartitions = recordsRepository.findAllByParentImportId(importContext.getImportId());
+            var recordsPartitions = recordsRepository.findAllByParentImportId(importContext.getImportId().id());
             var recordsIds = recordsPartitions.stream()
                     .map(importRecordsEntity -> Stream.concat(importRecordsEntity.getRecordIds().stream(), importRecordsEntity.getErrorRecordIds().stream()).toList())
                     .flatMap(Collection::stream)

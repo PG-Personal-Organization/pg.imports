@@ -8,7 +8,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.transaction.annotation.Transactional;
 import pg.imports.plugin.api.data.ImportRecordStatus;
 import pg.imports.plugin.api.reason.ImportRejectionReasons;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
@@ -23,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 
 import static pg.imports.plugin.api.data.ImportRecordStatus.*;
-import static pg.imports.plugin.api.data.ImportRecordStatus.IMPORTED;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -47,7 +45,6 @@ public class RecordsWriterManager implements ItemWriter<PartitionedRecord> {
 
     @Override
     @SuppressWarnings("unchecked")
-    @Transactional
     public void write(final Chunk<? extends PartitionedRecord> chunk) {
         var importContext = JobUtil.getImportContext(stepExecution);
         var recordsStoringStrategy = JobUtil.getRecordsStoringStrategy(stepExecution);
@@ -74,7 +71,7 @@ public class RecordsWriterManager implements ItemWriter<PartitionedRecord> {
         }
     }
 
-    private RecordsWriter getRecordsWriter(final RecordsStoringStrategy recordsStoringStrategy) {
+    private RecordsWriter getRecordsWriter(final @NonNull RecordsStoringStrategy recordsStoringStrategy) {
         return recordsWriters.stream().filter(recordsWriter -> recordsWriter.getRecordsStoringStrategy().equals(recordsStoringStrategy)).findFirst().orElseThrow();
     }
 }

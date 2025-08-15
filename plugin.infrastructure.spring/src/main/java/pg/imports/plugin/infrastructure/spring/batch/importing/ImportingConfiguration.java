@@ -48,13 +48,15 @@ public class ImportingConfiguration {
     private final PlatformTransactionManager transactionManager;
 
     @Bean
-    public ImportingJobLauncher importingJobLauncher(final ImportsConfigProvider importsConfigProvider,
+    public ImportingJobLauncher importingJobLauncher(final ImportRepository importRepository,
+                                                     final ImportsConfigProvider importsConfigProvider,
                                                      final JobLauncher jobLauncher,
                                                      final Job localImportingJob,
                                                      final Job localParallelImportingJob,
                                                      final Job distributedImportingJob
     ) {
-        return new ConfigurationBasedImportingJobLauncher(importsConfigProvider,
+        return new ConfigurationBasedImportingJobLauncher(importRepository,
+                importsConfigProvider,
                 jobLauncher,
                 localImportingJob,
                 localParallelImportingJob,

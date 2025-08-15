@@ -54,7 +54,7 @@ public class EngineDbRecordsWriter implements RecordsWriter {
                 .flatMap(entry -> entry.getValue().stream())
                 .collect(Collectors.toMap(r -> r.getId().toString(), RecordEntity::getErrorMessages, (l, r) -> l));
 
-        return new WrittenRecords(getRecordIdsByStatus(recordsByStatus, ERROR_STATUSES), getRecordIdsByStatus(recordsByStatus, SUCCESS_STATUSES), errorMessages);
+        return new WrittenRecords(getRecordIdsByStatus(recordsByStatus, SUCCESS_STATUSES), getRecordIdsByStatus(recordsByStatus, ERROR_STATUSES), errorMessages);
     }
 
     private List<String> getRecordIdsByStatus(final Map<ImportRecordStatus, List<RecordEntity>> records, final Set<ImportRecordStatus> statuses) {

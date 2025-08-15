@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -12,7 +11,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilder;
-import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,8 +45,6 @@ import pg.kafka.topic.TopicName;
 import java.util.List;
 
 @Configuration
-@EnableBatchProcessing
-@EnableBatchIntegration
 @RequiredArgsConstructor(onConstructor_ = @__({@Autowired, @Lazy}))
 public class BatchDistributedParsingConfiguration {
     private static final int PARSING_STEP_TRANSACTION_TIMEOUT = 3600;

@@ -4,9 +4,17 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.persistence.EntityManagerFactory;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.kafka.sender.EventSender;
 import pg.lib.awsfiles.infrastructure.config.AmazonConfig;
 import pg.lib.awsfiles.service.api.FileService;
@@ -25,6 +33,8 @@ import java.util.List;
         AmazonConfig.class
 })
 @Configuration
+@EnableBatchProcessing
+@EnableBatchIntegration
 public class BatchConfiguration {
 
     @Bean
@@ -33,8 +43,8 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public ImportingHelper importingHelper(final PluginCache pluginCache, final FileService fileService, final EventSender eventSender) {
-        return new ImportingHelperService(pluginCache, fileService, eventSender);
+    public ImportingHelper importingHelper(final PluginCache pluginCache, final ImportRepository importRepository, final FileService fileService, final EventSender eventSender) {
+        return new ImportingHelperService(pluginCache, importRepository, fileService, eventSender);
     }
 
     @Bean(name = "batchObjectMapper")
@@ -50,5 +60,13 @@ public class BatchConfiguration {
         );
         return objectMapper;
     }
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean
+    public PlatformTransactionManager transactionManager(final EntityManagerFactory entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory);
+    }
+
 
 }

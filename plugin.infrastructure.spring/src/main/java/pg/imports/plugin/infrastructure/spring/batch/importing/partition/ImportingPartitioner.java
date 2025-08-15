@@ -22,7 +22,7 @@ public class ImportingPartitioner implements Partitioner {
     @NonNull
     @Override
     public Map<String, ExecutionContext> partition(final int gridSize) {
-        var partitionIds = recordsRepository.findAllByParentImportId(importId).stream().map(ImportRecordsEntity::getId).toList();
+        var partitionIds = recordsRepository.findAllByParentImportId(importId.id()).stream().map(ImportRecordsEntity::getId).toList();
         Map<String, ExecutionContext> map = HashMap.newHashMap(partitionIds.size());
         for (int i = 0; i < partitionIds.size(); i++) {
             var context = new ExecutionContext();

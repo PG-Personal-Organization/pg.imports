@@ -3,6 +3,7 @@ package pg.imports.plugin.infrastructure.processing;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.transaction.annotation.Transactional;
+import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.kafka.sender.EventSender;
 import pg.lib.awsfiles.service.api.FileService;
 import pg.lib.awsfiles.service.api.FileView;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ImportingHelperService implements ImportingHelper {
     private final PluginCache pluginCache;
+    private final ImportRepository importRepository;
     private final FileService fileService;
     private final EventSender eventSender;
 
@@ -46,6 +48,7 @@ public class ImportingHelperService implements ImportingHelper {
 
 //        Optional<String> contextToken = headersHolder.tryToGetHeader(HeaderNames.CONTEXT_TOKEN);
         var importEntity = ImportFactory.createScheduledImport(importPlugin, fileId, null);
+        importRepository.save(importEntity);
         var importId = new ImportId(importEntity.getId());
 
         eventSender.sendEvent(ScheduledImportParsingEvent.of(importId));

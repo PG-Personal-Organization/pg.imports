@@ -32,7 +32,7 @@ public class ParsingErrorJobListener implements JobExecutionListener {
             var reason = getRejectReason(jobExecution);
             var importContext = JobUtil.getImportContext(jobExecution);
             log.info("Import {} rejected with reason {}, description: {}", importContext.getImportId(), reason, jobExecution.getExitStatus().getExitDescription());
-            var recordsPartitions = recordsRepository.findAllByParentImportId(importContext.getImportId());
+            var recordsPartitions = recordsRepository.findAllByParentImportId(importContext.getImportId().id());
             var recordsIds = recordsPartitions.stream().map(ImportRecordsEntity::getErrorRecordIds).flatMap(Collection::stream).toList();
             eventSender.sendEvent(RejectImportParsingEvent.of(importContext.getImportId(), reason, recordsIds));
         } catch (final Exception e) {

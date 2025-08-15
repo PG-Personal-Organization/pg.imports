@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.policy.NeverRetryPolicy;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import pg.kafka.sender.EventSender;
 import pg.imports.plugin.api.parsing.ReaderOutputItem;
@@ -50,6 +51,7 @@ public class BatchLocalParsingConfiguration {
     private final EventSender eventSender;
     private final ItemReader<ReaderOutputItem<Object>> itemReader;
     private final List<RecordsWriter> recordsWriters;
+    private final PlatformTransactionManager transactionManager;
 
     @JobScope
     @Bean
@@ -70,6 +72,7 @@ public class BatchLocalParsingConfiguration {
                 .processor(simpleItemProcessor(null))
                 .writer(simpleItemWriter(null))
                 .transactionAttribute(transactionAttribute)
+                .transactionManager(transactionManager)
                 .listener(new SimpleParsingExecutionErrorListener())
                 .build();
     }

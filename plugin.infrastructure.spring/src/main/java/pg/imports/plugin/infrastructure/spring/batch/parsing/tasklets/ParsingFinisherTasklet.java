@@ -38,7 +38,7 @@ public class ParsingFinisherTasklet implements Tasklet {
         parsingImport.finishParsing();
         importRepository.save(parsingImport);
 
-        var recordsPartitions = recordsRepository.findAllByParentImportId(parsingImport.getImportId());
+        var recordsPartitions = recordsRepository.findAllByParentImportId(parsingImport.getImportId().id());
         if (recordsPartitions.isEmpty()) {
             log.info("No records found for import {}, rejecting import.", parsingImport.getImportId());
             eventSender.sendEvent(RejectImportParsingEvent.of(parsingImport.getImportId(), ImportRejectionReasons.NO_RECORDS_FOUND));

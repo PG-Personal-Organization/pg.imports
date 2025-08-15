@@ -64,12 +64,14 @@ public class ParsingConfiguration {
     private final PlatformTransactionManager transactionManager;
 
     @Bean
-    public ParsingJobLauncher parsingJobLauncher(final ImportsConfigProvider importsConfigProvider,
+    public ParsingJobLauncher parsingJobLauncher(final ImportRepository importRepository,
+                                                 final ImportsConfigProvider importsConfigProvider,
                                                  final JobLauncher jobLauncher,
                                                  final Job localParsingJob,
                                                  final Job localParallelParsingJob,
                                                  final Job distributedParsingJob) {
-        return new ConfigurationBasedParsingJobLauncher(importsConfigProvider,
+        return new ConfigurationBasedParsingJobLauncher(importRepository,
+                importsConfigProvider,
                 jobLauncher,
                 localParsingJob,
                 localParallelParsingJob,

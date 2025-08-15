@@ -3,12 +3,11 @@ package pg.imports.plugin.infrastructure.importing;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.transaction.annotation.Transactional;
-import pg.kafka.consumer.MessageHandler;
 import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.processing.events.RejectImportImportingEvent;
+import pg.kafka.consumer.MessageHandler;
 
 @RequiredArgsConstructor
 @Log4j2
@@ -17,7 +16,6 @@ public class RejectImportImportingMessageHandler implements MessageHandler<Rejec
     private final PluginCache pluginCache;
 
     @Override
-    @Transactional
     public void handleMessage(final @NonNull RejectImportImportingEvent message) {
         var importId = message.getImportId();
         log.info("Rejecting importing of import {} with reason: {}", importId, message.getReason());

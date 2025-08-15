@@ -2,9 +2,7 @@ package pg.imports.plugin.infrastructure.spring.batch.importing;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobScope;
-import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
 import org.springframework.batch.integration.partition.StepExecutionRequestHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,8 +35,6 @@ import pg.kafka.topic.TopicName;
         DistributedImportingMasterConfiguration.class,
         DistributedImportingWorkerConfiguration.class
 })
-@EnableBatchProcessing
-@EnableBatchIntegration
 @RequiredArgsConstructor(onConstructor_ = @__({@Autowired, @Lazy}))
 public class BatchDistributedImportingConfiguration {
     private final RecordsRepository recordsRepository;

@@ -2,6 +2,8 @@
 # Spring Application Configuration
 # ===========================================
 spring:
+  application:
+    name: imports-test
   datasource:
     url: jdbc:postgresql://localhost:5432/testdb
     username: test
@@ -10,7 +12,13 @@ spring:
   # Profiles
   profiles:
     group:
-      test: USER,BATCH,test
+      test: USER,test
+  batch:
+    jdbc:
+      initialize-schema: always
+    transaction:
+      isolation-level-for-create: READ_COMMITTED
+
 
   # JPA/Hibernate Configuration
   jpa:
@@ -70,15 +78,20 @@ logging:
       kafka: debug
     org:
       apache:
-        zookeeper: ERROR
-        kafka: ERROR
-    kafka: ERROR
+        zookeeper: error
+        kafka: error
+      springframework:
+        security:
+          web: DEBUG
+          kafka: error
+      testcontainers: error
+    kafka: WARN
     state:
       change:
-        logger: ERROR
+        logger: error
     de:
       flapdoodle:
         embed:
           mongo:
             spring:
-              autoconfigure: ERROR
+              autoconfigure: error

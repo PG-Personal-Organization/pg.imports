@@ -33,7 +33,7 @@ public class SimpleImportingTasklet extends ImportingTasklet {
         importRepository.getImportingImport(importId.id());
         var plugin = pluginCache.getPlugin(importContext.getPluginCode());
 
-        var recordsPartitions = recordsRepository.findAllByParentImportId(importId);
+        var recordsPartitions = recordsRepository.findAllByParentImportId(importId.id());
         return execute(recordsPartitions, plugin, contribution);
     }
 

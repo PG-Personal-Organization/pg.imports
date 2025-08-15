@@ -95,14 +95,15 @@ class TestPluginIntegrationTest {
             // then
             await()
                     .atMost(30, TimeUnit.SECONDS)
-                    .pollInterval(1, TimeUnit.SECONDS)
+                    .pollInterval(5, TimeUnit.SECONDS)
                     .until(() -> {
                         var importEntity = importRepository.findByIdAndStatus(importId.id(), ImportStatus.PARSING_FINISHED);
                         return importEntity.isPresent();
                     });
 
-            var records = recordsRepository.findAllByParentImportId(importId);
-            Assertions.assertNotEquals(0, records.size());
+            var partitions = recordsRepository.findAllByParentImportId(importId.id());
+            Assertions.assertEquals(5, partitions.size());
+            Assertions.assertEquals(50, partitions.stream().mapToLong(importRecordsEntity -> importRecordsEntity.getRecordIds().size()).sum());
         }
     }
 }

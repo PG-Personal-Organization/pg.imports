@@ -3,5 +3,7 @@ package pg.imports.plugin.api.data;
 
 import lombok.*;
 
-public record PluginCode(@NonNull String code) {
+import java.io.Serializable;
+
+public record PluginCode(@NonNull String code) implements Serializable {
 }

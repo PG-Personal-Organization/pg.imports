@@ -2,5 +2,7 @@ package pg.imports.plugin.api.data;
 
 import lombok.*;
 
-public record ImportId(@NonNull String id) {
+import java.io.Serializable;
+
+public record ImportId(@NonNull String id) implements Serializable {
 }

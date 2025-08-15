@@ -78,7 +78,7 @@ public class ImportRecordsEntity {
                                            final Map<String, String> errorMessages,
                                            final RecordsStoringStrategy strategy) {
         return ImportRecordsEntity.builder()
-                .id(String.format("IMP_REC_%s_%s", parsingImport.getImportId(), partitionNumber))
+                .id(String.format("IMP_REC_%s_%s", parsingImport.getImportId().id(), partitionNumber))
                 .parent((ImportEntity) parsingImport)
                 .partitionNumber(partitionNumber)
                 .recordIds(new HashSet<>(recordIds))

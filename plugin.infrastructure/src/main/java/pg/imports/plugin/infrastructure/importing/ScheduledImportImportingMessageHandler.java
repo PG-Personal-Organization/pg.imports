@@ -4,13 +4,12 @@ package pg.imports.plugin.infrastructure.importing;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.transaction.annotation.Transactional;
-import pg.kafka.consumer.MessageHandler;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.plugins.ImportPluginNotFoundException;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.processing.events.ScheduledImportImportingEvent;
+import pg.kafka.consumer.MessageHandler;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -20,7 +19,6 @@ public class ScheduledImportImportingMessageHandler implements MessageHandler<Sc
     private final PluginCache pluginCache;
 
     @Override
-    @Transactional
     public void handleMessage(final @NonNull ScheduledImportImportingEvent message) {
         var importId = message.getImportId();
         ImportEntity parsedImport = importRepository.getParsedImport(importId.id());

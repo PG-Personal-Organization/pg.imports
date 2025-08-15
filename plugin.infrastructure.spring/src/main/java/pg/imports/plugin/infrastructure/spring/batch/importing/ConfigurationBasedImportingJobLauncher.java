@@ -13,6 +13,9 @@ import pg.imports.plugin.api.ImportPlugin;
 import pg.imports.plugin.api.data.ImportId;
 import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.infrastructure.importing.ImportingJobLauncher;
+import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
+import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.imports.ImportStatus;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
 import pg.imports.plugin.infrastructure.states.OngoingImportingImport;
@@ -20,6 +23,7 @@ import pg.imports.plugin.infrastructure.states.OngoingImportingImport;
 @Log4j2
 @RequiredArgsConstructor
 public class ConfigurationBasedImportingJobLauncher implements ImportingJobLauncher {
+    private final ImportRepository importRepository;
     private final ImportsConfigProvider importsConfigProvider;
     private final JobLauncher jobLauncher;
 
@@ -29,10 +33,17 @@ public class ConfigurationBasedImportingJobLauncher implements ImportingJobLaunc
 
     @Override
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void launchImportingJob(final ImportPlugin importPlugin, final OngoingImportingImport afterParsingImport) {
         try {
             JobExecution jobExecution;
+            ImportStatus importStatus = importRepository.findById(afterParsingImport.getImportId().id()).map(ImportEntity::getStatus).orElse(null);
+            if (importStatus == null || !importStatus.equals(ImportStatus.ONGOING_IMPORTING)) {
+                log.warn("Importing job cannot be launched because import status is not ONGOING_IMPORTING. ImportId: {}, status: {}", afterParsingImport.getImportId(),
+                        importStatus);
+                return;
+            }
+
             final var pluginCode = afterParsingImport.getPluginCode();
             final var defaultJobParameters = defaultJobParameters(afterParsingImport.getImportId(), pluginCode);
             switch (importsConfigProvider.getImportingStrategy(pluginCode)) {

@@ -9,10 +9,13 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import pg.imports.plugin.api.data.ImportId;
 import pg.imports.plugin.api.ImportPlugin;
+import pg.imports.plugin.api.data.ImportId;
 import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.infrastructure.parsing.ParsingJobLauncher;
+import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
+import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.imports.ImportStatus;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
 import pg.imports.plugin.infrastructure.states.OngoingParsingImport;
@@ -20,6 +23,7 @@ import pg.imports.plugin.infrastructure.states.OngoingParsingImport;
 @Log4j2
 @RequiredArgsConstructor
 public class ConfigurationBasedParsingJobLauncher implements ParsingJobLauncher {
+    private final ImportRepository importRepository;
     private final ImportsConfigProvider importsConfigProvider;
     private final JobLauncher jobLauncher;
 
@@ -28,10 +32,16 @@ public class ConfigurationBasedParsingJobLauncher implements ParsingJobLauncher 
     private final Job distributedParsingJob;
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void launchParsingJob(final ImportPlugin importPlugin, final OngoingParsingImport ongoingParsingImport) {
         try {
             JobExecution jobExecution;
+            ImportStatus importStatus = importRepository.findById(ongoingParsingImport.getImportId().id()).map(ImportEntity::getStatus).orElse(null);
+            if (importStatus == null || !importStatus.equals(ImportStatus.ONGOING_PARSING)) {
+                log.warn("Parsing job cannot be launched because import status is not ONGOING_PARSING. ImportId: {}, status: {}", ongoingParsingImport.getImportId(), importStatus);
+                return;
+            }
+
             final var pluginCode = ongoingParsingImport.getPluginCode();
             final var defaultJobParameters = defaultJobParameters(ongoingParsingImport.getImportId(), pluginCode);
             switch (importsConfigProvider.getParsingStrategy(pluginCode)) {
