@@ -6,7 +6,10 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.kafka.test.context.EmbeddedKafka;
@@ -16,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
 import pg.imports.config.ImportsIntegrationTest;
 import pg.imports.plugin.api.data.ImportId;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
@@ -25,10 +27,13 @@ import pg.imports.plugin.infrastructure.persistence.imports.ImportStatus;
 import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static org.awaitility.Awaitility.await;
 
@@ -48,7 +53,10 @@ class TestPluginIntegrationTest {
             .withPassword("test");
 
     @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
+    static void register(DynamicPropertyRegistry registry) {
+        if (!postgres.isRunning()) {
+            postgres.start();
+        }
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
@@ -68,15 +76,17 @@ class TestPluginIntegrationTest {
         RestAssured.reset();
     }
 
-    @Test
+
+    @MethodSource("shouldParseRecordsCorrectlyData")
+    @ParameterizedTest
     @SneakyThrows
-    void shouldParseRecordsCorrectly() {
+    void shouldParseRecordsCorrectly(final String pluginCode, final String fileName, final int expectedPartitionsCount, final int expectedRecordsCount) {
         // given
-        String file = "test/data/import_1.csv";
+        String file = "test/data/" + fileName;
         try (InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream(file)) {
             var fileId = RestAssured
                     .given()
-                    .multiPart("file", "import_1.csv", fileInputStream)
+                    .multiPart("file", fileName, fileInputStream)
 
                     .when()
                     .post("/api/v1/files/rest/upload")
@@ -91,21 +101,23 @@ class TestPluginIntegrationTest {
                     .param("fileId", fileId)
 
                     .when()
-                    .post("/api/v1/imports/start/{fileId}/{pluginCode}", fileId, "TEST")
+                    .post("/api/v1/imports/start/{fileId}/{pluginCode}", fileId, pluginCode)
 
                     .then()
                     .statusCode(200)
                     .extract().as(ImportId.class);
 
             // then
+            AtomicReference<ImportEntity> importEntity = new AtomicReference<>();
             AtomicReference<ImportStatus> status = new AtomicReference<>();
             await()
                     .atMost(30, TimeUnit.SECONDS)
                     .pollInterval(5, TimeUnit.SECONDS)
                     .until(() -> {
-                        var importEntity = importRepository.findByIdAndStatusIn(importId.id(), List.of(ImportStatus.PARSING_FINISHED, ImportStatus.PARSING_FAILED));
-                            status.set(importEntity.map(ImportEntity::getStatus).orElse(null));
-                        return importEntity.isPresent();
+                        var entity = importRepository.findByIdAndStatusIn(importId.id(), List.of(ImportStatus.PARSING_FINISHED, ImportStatus.PARSING_FAILED));
+                        status.set(entity.map(ImportEntity::getStatus).orElse(null));
+                        importEntity.set(entity.orElse(null));
+                        return entity.isPresent();
                     });
 
             if (status.get() == null || status.get() == ImportStatus.PARSING_FAILED) {
@@ -113,8 +125,29 @@ class TestPluginIntegrationTest {
             }
 
             var partitions = recordsRepository.findAllByParentImportId(importId.id());
-            Assertions.assertEquals(5, partitions.size());
-            Assertions.assertEquals(50, partitions.stream().mapToLong(importRecordsEntity -> importRecordsEntity.getRecordIds().size()).sum());
+            Assertions.assertEquals(expectedPartitionsCount, partitions.size());
+            Assertions.assertEquals(expectedRecordsCount, partitions.stream().mapToLong(importRecordsEntity -> importRecordsEntity.getRecordIds().size()).sum());
+
+            System.out.println("Import with id finished in: " + Duration.between(importEntity.get().getStartedParsingOn(), importEntity.get().getEndedParsingOn()).getSeconds());
         }
+    }
+
+    static Stream<Arguments> shouldParseRecordsCorrectlyData() {
+        return Stream.of(
+                Arguments.of("SIMPLE", "import_500.csv", 3, 500),
+                Arguments.of("SIMPLE", "import_1000.csv", 5, 1000),
+                Arguments.of("SIMPLE", "import_2000.csv", 10, 2000),
+                Arguments.of("SIMPLE", "import_10000.csv", 50, 10000),
+
+                Arguments.of("PARALLEL", "import_500.csv", 3, 500),
+                Arguments.of("PARALLEL", "import_1000.csv", 5, 1000),
+                Arguments.of("PARALLEL", "import_2000.csv", 10, 2000),
+                Arguments.of("PARALLEL", "import_10000.csv", 50, 10000),
+
+                Arguments.of("DISTRIBUTED", "import_500.csv", 3, 500),
+                Arguments.of("DISTRIBUTED", "import_1000.csv", 5, 1000),
+                Arguments.of("DISTRIBUTED", "import_2000.csv", 10, 2000),
+                Arguments.of("DISTRIBUTED", "import_10000.csv", 50, 10000)
+        );
     }
 }

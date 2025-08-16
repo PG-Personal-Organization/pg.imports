@@ -11,7 +11,7 @@ import pg.imports.plugin.api.parsing.ParsingComponentsProvider;
 import pg.imports.plugin.api.strategies.db.RecordData;
 
 @RequiredArgsConstructor
-public class TestPlugin implements ImportPlugin<TestRecord> {
+public class ParallelTestPlugin implements ImportPlugin<TestRecord> {
 
     private final ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> parsingProvider;
     private final ImportingComponentsProvider<TestRecord, ParsedRecord<RecordData>, ImportingRecordsProvider<ParsedRecord<RecordData>>> importingProvider;
@@ -19,7 +19,7 @@ public class TestPlugin implements ImportPlugin<TestRecord> {
     @NonNull
     @Override
     public PluginCode getCode() {
-        return new PluginCode("TEST");
+        return new PluginCode("PARALLEL");
     }
 
     @NonNull
@@ -31,12 +31,12 @@ public class TestPlugin implements ImportPlugin<TestRecord> {
     @NonNull
     @Override
     public String getCodeIdPrefix() {
-        return "TEST";
+        return "PARALLEL";
     }
 
     @Override
     public int getChunkSize() {
-        return 10;
+        return 200;
     }
 
     @NonNull

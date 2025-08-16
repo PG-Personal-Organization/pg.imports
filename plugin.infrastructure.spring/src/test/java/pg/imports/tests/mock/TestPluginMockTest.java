@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
 import pg.imports.tests.data.TestParsingComponentsProvider;
-import pg.imports.tests.data.TestPlugin;
+import pg.imports.tests.data.SimpleTestPlugin;
 import pg.imports.tests.data.TestRecord;
 import pg.imports.tests.data.TestRecordParser;
 import pg.imports.plugin.api.data.ImportContext;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class TestPluginMockTest {
 
-    private TestPlugin testPlugin;
+    private SimpleTestPlugin simpleTestPlugin;
     private String importId;
 
     @BeforeEach
@@ -33,17 +33,17 @@ class TestPluginMockTest {
 
         TestParsingComponentsProvider parsingComponentsProvider = new TestParsingComponentsProvider(new TestRecordParser());
 
-        testPlugin = new TestPlugin(parsingComponentsProvider, null);
+        simpleTestPlugin = new SimpleTestPlugin(parsingComponentsProvider, null);
     }
 
     @Test
     void shouldReturnCorrectPluginCode() {
         // when
-        var code = testPlugin.getCode();
+        var code = simpleTestPlugin.getCode();
 
         // then
         assertNotNull(code);
-        assertEquals("TEST", code.code());
+        assertEquals("SIMPLE", code.code());
     }
 
     @Test
@@ -57,8 +57,8 @@ class TestPluginMockTest {
                 .rawItem(TestRecord.builder().name("test1").value(BigDecimal.valueOf(3.20)).orderId(1).build())
                 .build();
 
-        var recordParser = testPlugin.getParsingComponentProvider().getRecordParser();
-        var importContext = ImportContext.of(new ImportId(importId), testPlugin.getCode(), UUID.randomUUID(), RecordsStoringStrategy.LIBRARY_JSON_DATABASE);
+        var recordParser = simpleTestPlugin.getParsingComponentProvider().getRecordParser();
+        var importContext = ImportContext.of(new ImportId(importId), simpleTestPlugin.getCode(), UUID.randomUUID(), RecordsStoringStrategy.LIBRARY_JSON_DATABASE);
         assertNotNull(recordParser);
 
         ParsedRecord<TestRecord> parsedRecord = recordParser.parse(recordData, importContext);
@@ -74,9 +74,9 @@ class TestPluginMockTest {
     @Test
     void shouldReturnCorrectPluginConfig() {
         // when & then
-        assertEquals("1.0.0", testPlugin.getVersion());
-        assertEquals("TEST", testPlugin.getCodeIdPrefix());
-        assertEquals(10, testPlugin.getChunkSize());
-        assertEquals(TestRecord.class, testPlugin.getRecordClass());
+        assertEquals("1.0.0", simpleTestPlugin.getVersion());
+        assertEquals("SIMPLE", simpleTestPlugin.getCodeIdPrefix());
+        assertEquals(10, simpleTestPlugin.getChunkSize());
+        assertEquals(TestRecord.class, simpleTestPlugin.getRecordClass());
     }
 }

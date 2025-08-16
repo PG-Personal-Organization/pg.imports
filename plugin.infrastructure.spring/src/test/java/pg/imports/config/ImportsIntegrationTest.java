@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Sql(
         scripts = "classpath:org/springframework/batch/core/schema-postgresql.sql",
         config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED),
-        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS
 )
 @ActiveProfiles({"test", "USER"})
 @SpringBootTest(

@@ -45,7 +45,7 @@ import java.util.concurrent.Future;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BatchParallelParsingConfiguration {
     private static final int PARSING_STEP_TRANSACTION_TIMEOUT = 1800;
-    private static final int QUEUE_LIMIT = 64;
+    private static final int QUEUE_LIMIT = 500;
 
     private final TaskletStep initParsingStep;
     private final TaskletStep finishParsingStep;
@@ -58,10 +58,10 @@ public class BatchParallelParsingConfiguration {
     private final PlatformTransactionManager chainedTransactionManager;
     private final List<RecordsWriter> recordsWriters;
 
-    @Value("${batch.parallel.parsing.corePoolSize:4}")
+    @Value("${pg.imports.batch.parallel.parsing.corePoolSize:4}")
     private int corePoolSize;
 
-    @Value("${batch.parallel.parsing.maxPoolSize:12}")
+    @Value("${pg.imports.batch.parallel.parsing.maxPoolSize:12}")
     private int maxPoolSize;
 
     @Bean

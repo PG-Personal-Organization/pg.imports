@@ -53,23 +53,44 @@ de:
 pg:
   kafka:
     enabled: true
+    # distributed processing topics
+    consumer-configs:
+      imports-test-chunk-request-processing-batch-topic:
+        concurrency: 6
+      imports-test-chunk-response-processing-batch-topic:
+        concurrency: 12
     # bootstrap-server: localhost:9092
   imports:
     enabled: true
     # defaults
     import-strategy: local
     parsing-strategy: local
+
     records-storing-strategy: library_json_database
     kafka-imports-message-strategy: light_records
+
     # Plugins specific
     plugins-import-strategy:
-      TEST: local
+      SIMPLE: local
+      PARALLEL: local_parallel
+      DISTRIBUTED: distributed
+
     plugins-parsing-strategy:
-      TEST: local
+      SIMPLE: local
+      PARALLEL: local_parallel
+      DISTRIBUTED: distributed
+
     pluginsDatabaseRecordsStoring:
-      TEST: library_json_database
+      SIMPLE: library_json_database
+      PARALLEL: library_json_database
+      DISTRIBUTED: library_json_database
     auto-start-importing-enabled: false
 
+    batch:
+      parallel:
+        parsing:
+          corePoolSize: 16
+          maxPoolSize: 32
 # ===========================================
 # Logging Configuration
 # ===========================================

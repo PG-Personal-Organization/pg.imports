@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import pg.imports.tests.data.TestParsingComponentsProvider;
-import pg.imports.tests.data.TestPlugin;
-import pg.imports.tests.data.TestRecordParser;
+import pg.imports.tests.data.*;
 import pg.lib.awsfiles.infrastructure.config.InMemoryMockConfiguration;
 import pg.lib.common.spring.config.CommonModuleConfiguration;
 
@@ -28,8 +26,18 @@ public class ImportsTestConfiguration {
     }
 
     @Bean
-    public TestPlugin testPlugin() {
-        return new TestPlugin(testParsingComponentsProvider(), null);
+    public SimpleTestPlugin simpleTestPlugin() {
+        return new SimpleTestPlugin(testParsingComponentsProvider(), null);
+    }
+
+    @Bean
+    public ParallelTestPlugin parallelTestPlugin() {
+        return new ParallelTestPlugin(testParsingComponentsProvider(), null);
+    }
+
+    @Bean
+    public DistributedTestPlugin distributedTestPlugin() {
+        return new DistributedTestPlugin(testParsingComponentsProvider(), null);
     }
 
     @Bean
