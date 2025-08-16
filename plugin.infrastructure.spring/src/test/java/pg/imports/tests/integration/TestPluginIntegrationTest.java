@@ -12,6 +12,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -31,6 +32,7 @@ import static org.awaitility.Awaitility.await;
 @ImportsIntegrationTest
 @EmbeddedKafka(brokerProperties = {"transaction.max.timeout.ms=3600000"})
 @Testcontainers
+@Transactional
 @RequiredArgsConstructor(onConstructor_ = @__(@Autowired))
 class TestPluginIntegrationTest {
     private final ImportRepository importRepository;

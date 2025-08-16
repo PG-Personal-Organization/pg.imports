@@ -1,5 +1,6 @@
 package pg.imports.plugin.infrastructure.spring.batch.parsing.writing;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -7,13 +8,16 @@ import lombok.extern.log4j.Log4j2;
 import pg.imports.plugin.api.ImportPlugin;
 import pg.imports.plugin.api.data.ImportContext;
 import pg.imports.plugin.api.data.ImportRecordStatus;
-import pg.imports.plugin.api.writing.WrittenRecords;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
+import pg.imports.plugin.api.writing.WrittenRecords;
 import pg.imports.plugin.infrastructure.persistence.records.db.RecordEntity;
 import pg.imports.plugin.infrastructure.persistence.records.db.RecordRepository;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.PartitionedRecord;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWriterManager.ERROR_STATUSES;
@@ -32,11 +36,13 @@ public class EngineDbRecordsWriter implements RecordsWriter {
         // TODO verify if batchObjectMapper is better serializer for dynamic data in recordData
         var recordsToWrite = records.stream().map(partitionedRecord -> {
             var importedRecord = partitionedRecord.getParsedRecord();
+            JsonNode jsonData = batchObjectMapper.valueToTree(importedRecord.getRecord());
             return RecordEntity.builder()
                     .importId(importedRecord.getImportId())
                     .recordStatus(importedRecord.getRecordStatus())
                     .ordinal(Math.toIntExact(importedRecord.getOrdinal()))
-                    .recordData(importedRecord.getRecord())
+                    .recordType(importedRecord.getRecord().getClass().getName())
+                    .recordData(jsonData)
                     .partitionId(partitionedRecord.getPartitionId())
                     .errorMessages(String.join("\n", importedRecord.getErrorMessages()))
                     .build();

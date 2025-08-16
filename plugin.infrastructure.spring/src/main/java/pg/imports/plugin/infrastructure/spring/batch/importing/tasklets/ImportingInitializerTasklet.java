@@ -15,8 +15,8 @@ import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
-import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
-import pg.imports.plugin.infrastructure.spring.common.config.KafkaImportsMessageStrategy;
+import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
+import pg.imports.plugin.infrastructure.config.KafkaImportsMessageStrategy;
 import pg.imports.plugin.infrastructure.states.OngoingImportingImport;
 
 @Log4j2

@@ -27,7 +27,7 @@ import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.Importin
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.ImportingInitializerTasklet;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.PartitionedImportingTasklet;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.SimpleImportingTasklet;
-import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
+import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
 
 @Import({
         BatchLocalImportingConfiguration.class,
@@ -104,8 +104,8 @@ public class ImportingConfiguration {
     }
 
     @Bean
-    public LibraryJsonImportingRecordsProvider dbJsonRecordsProvider(final RecordRepository recordRepository) {
-        return new LibraryJsonImportingRecordsProvider(recordRepository);
+    public LibraryJsonImportingRecordsProvider dbJsonRecordsProvider(final RecordRepository recordRepository, final ObjectMapper batchObjectMapper) {
+        return new LibraryJsonImportingRecordsProvider(recordRepository, batchObjectMapper);
     }
 
     @Bean

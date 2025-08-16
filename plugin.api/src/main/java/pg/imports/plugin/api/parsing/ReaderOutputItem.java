@@ -8,6 +8,8 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
+@EqualsAndHashCode
 public class ReaderOutputItem<TYPE> implements Serializable {
 
     private String id;

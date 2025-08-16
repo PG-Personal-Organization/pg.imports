@@ -17,7 +17,7 @@ import java.util.UUID;
 @Document(collection = "import_records")
 public class RecordDocument {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String importId;

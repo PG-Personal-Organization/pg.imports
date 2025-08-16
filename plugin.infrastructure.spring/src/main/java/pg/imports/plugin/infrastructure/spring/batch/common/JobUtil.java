@@ -8,7 +8,7 @@ import pg.imports.plugin.api.data.ImportContext;
 import pg.imports.plugin.api.data.ImportId;
 import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
-import pg.imports.plugin.infrastructure.spring.common.config.KafkaImportsMessageStrategy;
+import pg.imports.plugin.infrastructure.config.KafkaImportsMessageStrategy;
 
 import java.util.Map;
 import java.util.Objects;

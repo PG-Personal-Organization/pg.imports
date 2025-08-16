@@ -68,6 +68,7 @@ pg:
       TEST: local
     pluginsDatabaseRecordsStoring:
       TEST: library_json_database
+    auto-start-importing-enabled: false
 
 # ===========================================
 # Logging Configuration

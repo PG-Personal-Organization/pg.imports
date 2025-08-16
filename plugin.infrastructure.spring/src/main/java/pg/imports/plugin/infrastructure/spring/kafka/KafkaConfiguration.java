@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
 import pg.imports.plugin.infrastructure.processing.events.*;
 import pg.kafka.message.MessageDestination;
 import pg.kafka.sender.EventSender;
@@ -70,9 +71,10 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public ImportParsingFinishedMessageHandler importParsingFinishedMessageHandler(final ImportRepository importRepository,
+    public ImportParsingFinishedMessageHandler importParsingFinishedMessageHandler(final ImportsConfigProvider importsConfigProvider,
+                                                                                   final ImportRepository importRepository,
                                                                                    final EventSender eventSender) {
-        return new ImportParsingFinishedMessageHandler(importRepository, eventSender);
+        return new ImportParsingFinishedMessageHandler(importsConfigProvider, importRepository, eventSender);
     }
 
     @Bean

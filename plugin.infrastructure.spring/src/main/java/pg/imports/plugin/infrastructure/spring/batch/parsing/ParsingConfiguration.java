@@ -42,7 +42,7 @@ import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.EngineDbRec
 import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.EngineMongoRecordsWriter;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.PluginStoredRecordsWriter;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWriter;
-import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
+import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
 
 import java.io.InputStream;
 

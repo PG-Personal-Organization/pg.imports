@@ -23,4 +23,9 @@ public class ImportController {
     public ImportId startImporting(final @NonNull @PathVariable("fileId") UUID fileId, final @NonNull @PathVariable("pluginCode") String pluginCode) {
         return importingHelper.scheduleImport(pluginCode, fileId);
     }
+
+    @PostMapping(value = "/confirm/{importId}")
+    public void confirmImporting(final @NonNull @PathVariable("importId") String importId) {
+        importingHelper.confirmImporting(new ImportId(importId));
+    }
 }

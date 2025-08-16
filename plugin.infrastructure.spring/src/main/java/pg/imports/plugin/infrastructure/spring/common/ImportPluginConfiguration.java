@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import pg.imports.plugin.api.service.ImportingHelper;
-import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfig;
-import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfigProvider;
+import pg.imports.plugin.infrastructure.spring.common.config.ImportsConfigImpl;
+import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
 import pg.imports.plugin.infrastructure.spring.http.ImportController;
 import pg.imports.plugin.infrastructure.spring.kafka.KafkaConfiguration;
 import pg.imports.plugin.infrastructure.spring.mongo.MongoConfiguration;
@@ -21,12 +21,12 @@ import pg.imports.plugin.infrastructure.spring.persistence.DatabaseConfiguration
         BatchConfiguration.class,
         DatabaseConfiguration.class,
         MongoConfiguration.class,
-        ImportsConfig.class
+        ImportsConfigImpl.class
 })
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ImportPluginConfiguration {
-    private final ImportsConfig importsConfig;
+    private final ImportsConfigImpl importsConfig;
 
     @Bean
     public ImportsConfigProvider importsConfigProvider() {

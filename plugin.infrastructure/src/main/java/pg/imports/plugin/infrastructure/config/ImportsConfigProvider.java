@@ -1,4 +1,4 @@
-package pg.imports.plugin.infrastructure.spring.common.config;
+package pg.imports.plugin.infrastructure.config;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -10,6 +10,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ImportsConfigProvider {
     private ImportsConfig importsConfig;
+
+    public boolean shouldAutoStartImporting() {
+        return importsConfig.isAutoStartImportingEnabled();
+    }
 
     public ImportStrategy getParsingStrategy(final @NonNull PluginCode pluginCode) {
         return importsConfig.getPluginsParsingStrategy().getOrDefault(

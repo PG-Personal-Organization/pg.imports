@@ -1,11 +1,11 @@
 package pg.imports.plugin.infrastructure.persistence.records.db;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import pg.imports.plugin.api.data.ImportRecordStatus;
-import pg.imports.plugin.api.strategies.db.RecordData;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @ToString
 public class RecordEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String importId;
@@ -31,9 +31,12 @@ public class RecordEntity {
     @Enumerated(EnumType.STRING)
     private ImportRecordStatus recordStatus;
 
+    @Column(nullable = false, length = 400)
+    private String recordType;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")
-    private RecordData recordData;
+    private JsonNode recordData;
 
     private String errorMessages;
 
@@ -44,11 +47,12 @@ public class RecordEntity {
         }
         RecordEntity record = (RecordEntity) o;
         return ordinal == record.ordinal && Objects.equals(id, record.id) && Objects.equals(importId, record.importId) && Objects.equals(partitionId, record.partitionId)
-                && recordStatus == record.recordStatus && Objects.equals(recordData, record.recordData) && Objects.equals(errorMessages, record.errorMessages);
+                && recordStatus == record.recordStatus && Objects.equals(recordType, record.recordType)
+                && Objects.equals(recordData, record.recordData) && Objects.equals(errorMessages, record.errorMessages);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, importId, ordinal, partitionId, recordStatus, recordData, errorMessages);
+        return Objects.hash(id, importId, ordinal, partitionId, recordStatus, recordType, recordData, errorMessages);
     }
 }

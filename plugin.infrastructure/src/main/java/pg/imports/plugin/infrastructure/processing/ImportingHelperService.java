@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.transaction.annotation.Transactional;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.processing.events.ScheduledImportImportingEvent;
 import pg.kafka.sender.EventSender;
 import pg.lib.awsfiles.service.api.FileService;
 import pg.lib.awsfiles.service.api.FileView;
@@ -37,6 +38,14 @@ public class ImportingHelperService implements ImportingHelper {
         var importId = startImport(importPlugin, fileId);
         log.info("Import scheduled with id {}", importId);
         return importId;
+    }
+
+    @Override
+    @Transactional
+    public void confirmImporting(final ImportId importId) {
+        var importEntity = importRepository.getParsedImport(importId.id());
+        log.info("Import {} importing triggered", importEntity);
+        eventSender.sendEvent(ScheduledImportImportingEvent.of(importId));
     }
 
     private ImportId startImport(final ImportPlugin importPlugin, final UUID fileId) {

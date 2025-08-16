@@ -8,7 +8,6 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
@@ -21,19 +20,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
-import pg.kafka.sender.EventSender;
 import pg.imports.plugin.api.parsing.ReaderOutputItem;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.listeners.ParsingErrorJobListener;
+import pg.imports.plugin.infrastructure.spring.batch.parsing.listeners.SimpleItemWriteListener;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.listeners.SimpleParsingExecutionErrorListener;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.PartitionedRecord;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.ReaderOutputItemProcessor;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWriter;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWriterManager;
 import pg.imports.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListener;
+import pg.kafka.sender.EventSender;
 
 import java.util.List;
 
@@ -56,24 +56,22 @@ public class BatchLocalParsingConfiguration {
     @JobScope
     @Bean
     public TaskletStep simpleParsingStep(final @Value("#{jobExecution}") JobExecution jobExecution) {
-        FaultTolerantStepBuilder<ReaderOutputItem<Object>, PartitionedRecord> faultTolerantStepBuilder = new FaultTolerantStepBuilder<>(
-                new StepBuilder("simpleParsingStep", jobRepository));
-
         var transactionAttribute = new DefaultTransactionAttribute();
         transactionAttribute.setTimeout(PARSING_STEP_TRANSACTION_TIMEOUT);
 
         var importContext = JobUtil.getImportContext(jobExecution);
         var plugin = pluginCache.getPlugin(importContext.getPluginCode());
 
-        return faultTolerantStepBuilder
+        return new StepBuilder("simpleParsingStep", jobRepository)
+                .<ReaderOutputItem<Object>, PartitionedRecord>chunk(plugin.getChunkSize(), transactionManager)
+                .faultTolerant()
                 .retryPolicy(new NeverRetryPolicy())
-                .chunk(plugin.getChunkSize())
                 .reader(itemReader)
                 .processor(simpleItemProcessor(null))
                 .writer(simpleItemWriter(null))
                 .transactionAttribute(transactionAttribute)
-                .transactionManager(transactionManager)
                 .listener(new SimpleParsingExecutionErrorListener())
+                .listener(new SimpleItemWriteListener())
                 .build();
     }
 
