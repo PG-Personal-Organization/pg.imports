@@ -7,7 +7,6 @@ import org.springframework.batch.core.StepExecution;
 import pg.imports.plugin.api.data.ImportContext;
 import pg.imports.plugin.api.data.ImportId;
 import pg.imports.plugin.api.data.PluginCode;
-import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
 import pg.imports.plugin.infrastructure.config.KafkaImportsMessageStrategy;
 
 import java.util.Map;
@@ -21,7 +20,6 @@ public class JobUtil {
     public static final String FILE_ID_KEY = "FILE_ID";
     public static final String IMPORT_CONTEXT_KEY = "IMPORT_CONTEXT";
     public static final String KAFKA_IMPORTS_MESSAGE_STRATEGY_KEY = "KAFKA_IMPORTS_MESSAGE_STRATEGY";
-    public static final String RECORDS_STORING_STRATEGY_KEY = "RECORDS_STORING_STRATEGY";
     public static final String REJECT_REASON_KEY = "REJECT_REASON";
 
     public ImportId getImportId(final StepContribution contribution) {
@@ -77,14 +75,6 @@ public class JobUtil {
 
     public KafkaImportsMessageStrategy getKafkaImportsMessageStrategy(final StepContribution contribution) {
         return (KafkaImportsMessageStrategy) contribution.getStepExecution().getJobExecution().getExecutionContext().get(KAFKA_IMPORTS_MESSAGE_STRATEGY_KEY);
-    }
-
-    public void putRecordsStoringStrategy(final StepContribution contribution, final RecordsStoringStrategy strategy) {
-        contribution.getStepExecution().getJobExecution().getExecutionContext().put(RECORDS_STORING_STRATEGY_KEY, strategy);
-    }
-
-    public RecordsStoringStrategy getRecordsStoringStrategy(final StepExecution stepExecution) {
-        return (RecordsStoringStrategy) stepExecution.getJobExecution().getExecutionContext().get(RECORDS_STORING_STRATEGY_KEY);
     }
 
     public String getRejectReason(final StepExecution stepExecution) {

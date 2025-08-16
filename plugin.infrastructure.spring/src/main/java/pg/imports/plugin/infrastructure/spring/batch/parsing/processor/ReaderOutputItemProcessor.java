@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
+import pg.imports.plugin.api.data.ImportContext;
 import pg.imports.plugin.api.parsing.ReaderOutputItem;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
@@ -15,10 +16,8 @@ public class ReaderOutputItemProcessor implements ItemProcessor<ReaderOutputItem
     private final StepExecution stepExecution;
     private final PluginCache pluginCache;
 
-    @Override
     @SuppressWarnings("unchecked")
-    public PartitionedRecord process(final @NonNull ReaderOutputItem<Object> item) {
-        var importContext = JobUtil.getImportContext(stepExecution);
+    public PartitionedRecord process(final @NonNull ReaderOutputItem<Object> item, final ImportContext importContext) {
         var plugin = pluginCache.getPlugin(importContext.getPluginCode());
 
         var recordParser = plugin.getParsingComponentProvider().getRecordParser();
@@ -33,5 +32,10 @@ public class ReaderOutputItemProcessor implements ItemProcessor<ReaderOutputItem
             JobUtil.putRejectReason(stepExecution, String.format("Record parsing exception: %s", e.getMessage()));
             throw e;
         }
+    }
+
+    @Override
+    public PartitionedRecord process(final @NonNull ReaderOutputItem<Object> item) {
+        return process(item, JobUtil.getImportContext(stepExecution));
     }
 }

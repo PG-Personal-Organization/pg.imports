@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
 import pg.imports.tests.data.TestParsingComponentsProvider;
 import pg.imports.tests.data.TestPlugin;
 import pg.imports.tests.data.TestRecord;
@@ -57,7 +58,7 @@ class TestPluginMockTest {
                 .build();
 
         var recordParser = testPlugin.getParsingComponentProvider().getRecordParser();
-        var importContext = ImportContext.of(new ImportId(importId), testPlugin.getCode(), UUID.randomUUID());
+        var importContext = ImportContext.of(new ImportId(importId), testPlugin.getCode(), UUID.randomUUID(), RecordsStoringStrategy.LIBRARY_JSON_DATABASE);
         assertNotNull(recordParser);
 
         ParsedRecord<TestRecord> parsedRecord = recordParser.parse(recordData, importContext);

@@ -19,13 +19,16 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import pg.imports.config.ImportsIntegrationTest;
 import pg.imports.plugin.api.data.ImportId;
+import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportStatus;
 import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.awaitility.Awaitility.await;
 
@@ -95,13 +98,19 @@ class TestPluginIntegrationTest {
                     .extract().as(ImportId.class);
 
             // then
+            AtomicReference<ImportStatus> status = new AtomicReference<>();
             await()
                     .atMost(30, TimeUnit.SECONDS)
                     .pollInterval(5, TimeUnit.SECONDS)
                     .until(() -> {
-                        var importEntity = importRepository.findByIdAndStatus(importId.id(), ImportStatus.PARSING_FINISHED);
+                        var importEntity = importRepository.findByIdAndStatusIn(importId.id(), List.of(ImportStatus.PARSING_FINISHED, ImportStatus.PARSING_FAILED));
+                            status.set(importEntity.map(ImportEntity::getStatus).orElse(null));
                         return importEntity.isPresent();
                     });
+
+            if (status.get() == null || status.get() == ImportStatus.PARSING_FAILED) {
+                throw new RuntimeException("Import with id " + importId.id() + " failed.");
+            }
 
             var partitions = recordsRepository.findAllByParentImportId(importId.id());
             Assertions.assertEquals(5, partitions.size());

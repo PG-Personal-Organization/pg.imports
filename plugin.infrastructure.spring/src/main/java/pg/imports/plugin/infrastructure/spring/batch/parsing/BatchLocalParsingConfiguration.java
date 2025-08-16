@@ -78,7 +78,7 @@ public class BatchLocalParsingConfiguration {
     @Bean
     @StepScope
     public ItemWriter<PartitionedRecord> simpleItemWriter(final @Value("#{stepExecution}") StepExecution execution) {
-        return new RecordsWriterManager(execution, pluginCache, recordsWriters, recordsRepository, importRepository);
+        return new RecordsWriterManager(pluginCache, recordsWriters, recordsRepository, importRepository, execution);
     }
 
     @Bean

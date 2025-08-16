@@ -1,9 +1,7 @@
 package pg.imports.plugin.api.data;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -11,11 +9,14 @@ import java.util.UUID;
 @EqualsAndHashCode
 @ToString
 @Getter
-@RequiredArgsConstructor(staticName = "of")
+@AllArgsConstructor(staticName = "of")
+@NoArgsConstructor
 public class ImportContext implements Serializable {
-    private final ImportId importId;
+    private ImportId importId;
 
-    private final PluginCode pluginCode;
+    private PluginCode pluginCode;
 
-    private final UUID fileId;
+    private UUID fileId;
+
+    private RecordsStoringStrategy recordsStoringStrategy;
 }

@@ -1,13 +1,11 @@
 package pg.imports.plugin.infrastructure.spring.batch.parsing.writing;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
+import pg.imports.plugin.api.data.ImportContext;
 import pg.imports.plugin.api.data.ImportRecordStatus;
 import pg.imports.plugin.api.reason.ImportRejectionReasons;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
@@ -24,6 +22,7 @@ import java.util.Set;
 import static pg.imports.plugin.api.data.ImportRecordStatus.*;
 
 @Log4j2
+@AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 public class RecordsWriterManager implements ItemWriter<PartitionedRecord> {
@@ -33,8 +32,6 @@ public class RecordsWriterManager implements ItemWriter<PartitionedRecord> {
             Set.of(PARSED, IMPORTED);
 
     @NonNull
-    private final StepExecution stepExecution;
-    @NonNull
     private final PluginCache pluginCache;
     @NonNull
     private final List<RecordsWriter> recordsWriters;
@@ -43,11 +40,11 @@ public class RecordsWriterManager implements ItemWriter<PartitionedRecord> {
     @NonNull
     private final ImportRepository importRepository;
 
-    @Override
+    private StepExecution stepExecution;
+
     @SuppressWarnings("unchecked")
-    public void write(final Chunk<? extends PartitionedRecord> chunk) {
-        var importContext = JobUtil.getImportContext(stepExecution);
-        var recordsStoringStrategy = JobUtil.getRecordsStoringStrategy(stepExecution);
+    public void write(final Chunk<? extends PartitionedRecord> chunk, final ImportContext importContext) {
+        var recordsStoringStrategy = importContext.getRecordsStoringStrategy();
         var plugin = pluginCache.getPlugin(importContext.getPluginCode());
         var inProgressImport = importRepository.getParsingImport(importContext.getImportId().id());
 
@@ -66,9 +63,16 @@ public class RecordsWriterManager implements ItemWriter<PartitionedRecord> {
             recordsRepository.save(recordsEntity);
         } catch (Exception e) {
             log.error("Item Writer error with import id {}", importContext.getImportId(), e);
-            stepExecution.getExecutionContext().put(JobUtil.REJECT_REASON_KEY, String.format("%s:\n%s", ImportRejectionReasons.UNEXPECTED, e.getMessage()));
+            if (stepExecution != null) {
+                stepExecution.getExecutionContext().put(JobUtil.REJECT_REASON_KEY, String.format("%s:\n%s", ImportRejectionReasons.UNEXPECTED, e.getMessage()));
+            }
             throw e;
         }
+    }
+
+    @Override
+    public void write(final @NonNull Chunk<? extends PartitionedRecord> chunk) {
+        write(chunk, JobUtil.getImportContext(stepExecution));
     }
 
     private RecordsWriter getRecordsWriter(final @NonNull RecordsStoringStrategy recordsStoringStrategy) {

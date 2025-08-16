@@ -41,9 +41,8 @@ public class ParsingInitializerTasklet implements Tasklet {
         log.info("KafkaImportsMessageStrategy: {}, RecordsStoringStrategy: {} resolved for import: {}",
                 kafkaImportsMessageStrategy, recordsStoringStrategy, ongoingParsingImport.getImportId());
         JobUtil.putKafkaImportsMessageStrategy(contribution, kafkaImportsMessageStrategy);
-        JobUtil.putRecordsStoringStrategy(contribution, recordsStoringStrategy);
         JobUtil.putFileId(contribution, ongoingParsingImport.getFileId());
-        JobUtil.putImportContext(contribution, ImportContext.of(ongoingParsingImport.getImportId(), pluginCode, ongoingParsingImport.getFileId()));
+        JobUtil.putImportContext(contribution, ImportContext.of(ongoingParsingImport.getImportId(), pluginCode, ongoingParsingImport.getFileId(), recordsStoringStrategy));
     }
 
 }

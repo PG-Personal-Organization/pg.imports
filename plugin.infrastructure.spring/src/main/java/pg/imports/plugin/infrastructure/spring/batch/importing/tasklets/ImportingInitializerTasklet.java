@@ -12,11 +12,11 @@ import pg.imports.plugin.api.data.ImportContext;
 import pg.imports.plugin.api.data.ImportId;
 import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
+import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
+import pg.imports.plugin.infrastructure.config.KafkaImportsMessageStrategy;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
-import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
-import pg.imports.plugin.infrastructure.config.KafkaImportsMessageStrategy;
 import pg.imports.plugin.infrastructure.states.OngoingImportingImport;
 
 @Log4j2
@@ -42,8 +42,7 @@ public class ImportingInitializerTasklet implements Tasklet {
         log.info("KafkaImportsMessageStrategy: {}, RecordsStoringStrategy: {} resolved for import: {}",
                 kafkaImportsMessageStrategy, recordsStoringStrategy, ongoingImport.getImportId());
         JobUtil.putKafkaImportsMessageStrategy(contribution, kafkaImportsMessageStrategy);
-        JobUtil.putRecordsStoringStrategy(contribution, recordsStoringStrategy);
         JobUtil.putFileId(contribution, ongoingImport.getFileId());
-        JobUtil.putImportContext(contribution, ImportContext.of(ongoingImport.getImportId(), ongoingImport.getPluginCode(), ongoingImport.getFileId()));
+        JobUtil.putImportContext(contribution, ImportContext.of(ongoingImport.getImportId(), ongoingImport.getPluginCode(), ongoingImport.getFileId(), recordsStoringStrategy));
     }
 }

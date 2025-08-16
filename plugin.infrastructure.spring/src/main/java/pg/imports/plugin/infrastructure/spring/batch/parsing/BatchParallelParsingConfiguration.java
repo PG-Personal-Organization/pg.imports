@@ -100,7 +100,7 @@ public class BatchParallelParsingConfiguration {
     @Bean
     @StepScope
     public ItemWriter<PartitionedRecord> parallelItemWriter(final @Value("#{stepExecution}") StepExecution execution) {
-        return new RecordsWriterManager(execution, pluginCache, recordsWriters, recordsRepository, importRepository);
+        return new RecordsWriterManager(pluginCache, recordsWriters, recordsRepository, importRepository, execution);
     }
 
     @Bean

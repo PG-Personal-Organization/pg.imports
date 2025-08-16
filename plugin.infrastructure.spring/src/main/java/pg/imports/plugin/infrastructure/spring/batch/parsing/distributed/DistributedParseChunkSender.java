@@ -1,48 +1,46 @@
 package pg.imports.plugin.infrastructure.spring.batch.parsing.distributed;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.integration.chunk.ChunkRequest;
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.MessagingException;
+import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.kafka.sender.EventSender;
-import pg.imports.plugin.infrastructure.spring.batch.common.distributed.ChunkSendingException;
-import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.PartitionedRecord;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 @Log4j2
 @RequiredArgsConstructor
-@StepScope
-public class DistributedParseChunkSender implements ItemWriter<PartitionedRecord> {
-    private final AtomicLong sequence = new AtomicLong();
+public class DistributedParseChunkSender implements MessageHandler {
     private final EventSender eventSender;
-    private final long jobId;
-
-    private StepExecution stepExecution;
-
-    @BeforeStep
-    @SuppressWarnings("HiddenField")
-    public void beforeStep(final StepExecution stepExecution) {
-        this.stepExecution = stepExecution;
-    }
+    private final ObjectMapper batchObjectMapper;
 
     @Override
-    public void write(final Chunk<? extends PartitionedRecord> chunk) {
-        var chunkRequest = new ChunkRequest<PartitionedRecord>((int) sequence.getAndIncrement(), chunk, jobId, stepExecution.createStepContribution());
-        log.info("Sending chunk: {}", chunkRequest);
+    public void handleMessage(final @NonNull Message<?> message) throws MessagingException {
+        Object payload = message.getPayload();
+
+        if (!(payload instanceof ChunkRequest<?> chunkRequest)) {
+            log.warn("Ignoring message with unexpected payload: {}", payload.getClass());
+            return;
+        }
+
+        log.info("Sending chunk request: seq={}, jobId={}, items={}",
+                chunkRequest.getSequence(), chunkRequest.getJobId(), chunkRequest.getItems().size());
+
         try {
-            var importChunkMessage = new ParseChunkMessageRequest(chunkRequest);
-            eventSender.sendEvent(importChunkMessage);
-        } catch (final Exception e) {
-            log.error("Error during chunk sending", e);
-            if (chunk.getItems().isEmpty()) {
-                throw new IllegalArgumentException("Chunk is empty");
-            }
-            throw new ChunkSendingException(String.format("Error during chunk nr.%s sending", chunk.getItems().getFirst().getChunkNumber()), e);
+            var importContext = JobUtil.getImportContext(chunkRequest.getStepContribution().getStepExecution());
+            var items = chunkRequest.getItems().getItems()
+                    .stream()
+                    .map(item -> (JsonNode) batchObjectMapper.valueToTree(item))
+                    .toList();
+            var outbound = new ParseChunkMessageRequest(chunkRequest.getJobId(), chunkRequest.getSequence(), items, importContext);
+            eventSender.sendEvent(outbound);
+        } catch (Exception e) {
+            log.error("Error during chunk sending (seq={})", chunkRequest.getSequence(), e);
+            throw new MessagingException(message, "Failed to send chunk request", e);
         }
     }
 }
