@@ -10,6 +10,8 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.integration.async.AsyncItemProcessor;
+import org.springframework.batch.integration.async.AsyncItemWriter;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -37,12 +39,13 @@ import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWrit
 import pg.imports.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListener;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BatchParallelParsingConfiguration {
     private static final int PARSING_STEP_TRANSACTION_TIMEOUT = 1800;
-    private static final int PARALLEL_THROTTLE_LIMIT = 4;
+    private static final int QUEUE_LIMIT = 64;
 
     private final TaskletStep initParsingStep;
     private final TaskletStep finishParsingStep;
@@ -66,7 +69,7 @@ public class BatchParallelParsingConfiguration {
         ThreadPoolTaskExecutor t = new ThreadPoolTaskExecutor();
         t.setCorePoolSize(corePoolSize);
         t.setMaxPoolSize(maxPoolSize);
-        t.setQueueCapacity(maxPoolSize);
+        t.setQueueCapacity(Math.max(maxPoolSize * 2, QUEUE_LIMIT));
         t.setThreadNamePrefix("parallel-imports-parsing-");
         t.initialize();
         return t;
@@ -82,17 +85,12 @@ public class BatchParallelParsingConfiguration {
         var plugin = pluginCache.getPlugin(importContext.getPluginCode());
         var chunkSize = plugin.getChunkSize();
 
-        var parallelStepBuilder = new StepBuilder(
-                "parallelParsingStep", jobRepository)
-                .<ReaderOutputItem<Object>, PartitionedRecord>chunk(chunkSize, chainedTransactionManager)
+        return new StepBuilder("parallelParsingStep", jobRepository)
+                .<ReaderOutputItem<Object>, Future<PartitionedRecord>>chunk(chunkSize, chainedTransactionManager)
                 .reader(itemReader)
-                .processor(parallelItemProcessor(null))
-                .writer(parallelItemWriter(null))
+                .processor(asyncParallelItemProcessor())
+                .writer(asyncParallelItemWriter())
                 .transactionAttribute(transactionAttribute)
-                .taskExecutor(parallelParsingTaskExecutor())
-                .throttleLimit(PARALLEL_THROTTLE_LIMIT);
-
-        return parallelStepBuilder
                 .faultTolerant()
                 .retryPolicy(new NeverRetryPolicy())
                 .listener(new SimpleParsingExecutionErrorListener())
@@ -106,10 +104,25 @@ public class BatchParallelParsingConfiguration {
     }
 
     @Bean
+    public AsyncItemWriter<PartitionedRecord> asyncParallelItemWriter() {
+        var w = new AsyncItemWriter<PartitionedRecord>();
+        w.setDelegate(parallelItemWriter(null));
+        return w;
+    }
+
+    @Bean
     @StepScope
-    public ItemProcessor<? super ReaderOutputItem<Object>, PartitionedRecord> parallelItemProcessor(
+    public ItemProcessor<ReaderOutputItem<Object>, PartitionedRecord> parallelItemProcessor(
             final @Value("#{stepExecution}") StepExecution execution) {
         return new ReaderOutputItemProcessor(execution, pluginCache);
+    }
+
+    @Bean
+    public AsyncItemProcessor<ReaderOutputItem<Object>, PartitionedRecord> asyncParallelItemProcessor() {
+        var p = new AsyncItemProcessor<ReaderOutputItem<Object>, PartitionedRecord>();
+        p.setDelegate(parallelItemProcessor(null));
+        p.setTaskExecutor(parallelParsingTaskExecutor());
+        return p;
     }
 
     @Bean
