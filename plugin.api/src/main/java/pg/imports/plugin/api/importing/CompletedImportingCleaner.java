@@ -5,5 +5,7 @@ import lombok.NonNull;
 import java.util.List;
 
 public interface CompletedImportingCleaner {
-    void handleCleaning(@NonNull List<String> recordIds, @NonNull List<String> errorRecordIds);
+    void handleCleaningSuccessfulRecords(@NonNull List<String> recordIds);
+
+    void handleCleaningFailedRecords(@NonNull List<String> errorRecordIds);
 }

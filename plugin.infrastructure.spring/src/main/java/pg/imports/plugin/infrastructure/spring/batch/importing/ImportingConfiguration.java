@@ -14,20 +14,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
-import pg.kafka.sender.EventSender;
+import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
 import pg.imports.plugin.infrastructure.importing.ImportingJobLauncher;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.persistence.records.db.RecordRepository;
 import pg.imports.plugin.infrastructure.persistence.records.mongo.MongoRecordRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
-import pg.imports.plugin.infrastructure.spring.batch.importing.readers.LibraryJsonImportingRecordsProvider;
-import pg.imports.plugin.infrastructure.spring.batch.importing.readers.MongoImportingRecordsProvider;
+import pg.imports.plugin.infrastructure.spring.batch.importing.records.provider.ImportingRecordsProviderFactory;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.ImportingFinisherTasklet;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.ImportingInitializerTasklet;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.PartitionedImportingTasklet;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.SimpleImportingTasklet;
-import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
+import pg.kafka.sender.EventSender;
 
 @Import({
         BatchLocalImportingConfiguration.class,
@@ -69,13 +68,13 @@ public class ImportingConfiguration {
     }
 
     @Bean
-    public Tasklet simpleImportingTasklet(final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider, final MongoImportingRecordsProvider mongoRecordsProvider) {
-        return new SimpleImportingTasklet(importRepository, pluginCache, recordsRepository, dbJsonRecordsProvider, mongoRecordsProvider);
+    public Tasklet simpleImportingTasklet(final ImportingRecordsProviderFactory importingRecordsProviderFactory) {
+        return new SimpleImportingTasklet(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory);
     }
 
     @Bean
-    public Tasklet partitionedImportingTasklet(final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider, final MongoImportingRecordsProvider mongoRecordsProvider) {
-        return new PartitionedImportingTasklet(importRepository, pluginCache, recordsRepository, dbJsonRecordsProvider, mongoRecordsProvider);
+    public Tasklet partitionedImportingTasklet(final ImportingRecordsProviderFactory importingRecordsProviderFactory) {
+        return new PartitionedImportingTasklet(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory);
     }
 
     @Bean
@@ -104,18 +103,9 @@ public class ImportingConfiguration {
     }
 
     @Bean
-    public LibraryJsonImportingRecordsProvider dbJsonRecordsProvider(final RecordRepository recordRepository, final ObjectMapper batchObjectMapper) {
-        return new LibraryJsonImportingRecordsProvider(recordRepository, batchObjectMapper);
+    public ImportingRecordsProviderFactory importingRecordsProviderFactory(final RecordRepository recordRepository, final MongoRecordRepository mongoRecordRepository,
+                                                                           final ObjectMapper batchObjectMapper) {
+        return new ImportingRecordsProviderFactory(recordRepository, mongoRecordRepository, batchObjectMapper);
     }
-
-    @Bean
-    public MongoImportingRecordsProvider mongoRecordsProvider(final MongoRecordRepository recordRepository, final ObjectMapper batchObjectMapper) {
-        return new MongoImportingRecordsProvider(recordRepository, batchObjectMapper);
-    }
-
-//    @Bean
-//    public ImportingErrorHandler importingErrorHandler() {
-//        return new ImportingErrorHandler(recordsRepository, pluginCache);
-//    }
 
 }

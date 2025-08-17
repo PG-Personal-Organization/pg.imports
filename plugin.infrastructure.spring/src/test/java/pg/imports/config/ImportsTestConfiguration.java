@@ -9,6 +9,11 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import pg.imports.tests.data.*;
+import pg.imports.tests.data.common.importing.InMemoryImportedPaymentsRepository;
+import pg.imports.tests.data.common.importing.TestImportingComponentsProvider;
+import pg.imports.tests.data.common.importing.TestRecordImporter;
+import pg.imports.tests.data.common.parsing.TestParsingComponentsProvider;
+import pg.imports.tests.data.common.parsing.TestRecordParser;
 import pg.lib.awsfiles.infrastructure.config.InMemoryMockConfiguration;
 import pg.lib.common.spring.config.CommonModuleConfiguration;
 
@@ -26,18 +31,33 @@ public class ImportsTestConfiguration {
     }
 
     @Bean
+    public InMemoryImportedPaymentsRepository importedPaymentsRepository() {
+        return new InMemoryImportedPaymentsRepository();
+    }
+
+    @Bean
+    public TestRecordImporter testRecordImporter() {
+        return new TestRecordImporter(importedPaymentsRepository());
+    }
+
+    @Bean
+    public TestImportingComponentsProvider testImportingComponentsProvider() {
+        return new TestImportingComponentsProvider(testRecordImporter());
+    }
+
+    @Bean
     public SimpleTestPlugin simpleTestPlugin() {
-        return new SimpleTestPlugin(testParsingComponentsProvider(), null);
+        return new SimpleTestPlugin(testParsingComponentsProvider(), testImportingComponentsProvider());
     }
 
     @Bean
     public ParallelTestPlugin parallelTestPlugin() {
-        return new ParallelTestPlugin(testParsingComponentsProvider(), null);
+        return new ParallelTestPlugin(testParsingComponentsProvider(), testImportingComponentsProvider());
     }
 
     @Bean
     public DistributedTestPlugin distributedTestPlugin() {
-        return new DistributedTestPlugin(testParsingComponentsProvider(), null);
+        return new DistributedTestPlugin(testParsingComponentsProvider(), testImportingComponentsProvider());
     }
 
     @Bean

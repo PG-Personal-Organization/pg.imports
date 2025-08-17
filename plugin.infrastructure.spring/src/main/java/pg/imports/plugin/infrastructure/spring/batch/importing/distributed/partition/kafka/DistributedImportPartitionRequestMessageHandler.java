@@ -19,7 +19,7 @@ public class DistributedImportPartitionRequestMessageHandler implements MessageH
     public void handleMessage(final @NonNull ImportPartitionMessageRequest message) {
         var request = message.getRequest();
         var stepExecution = stepExecutionRequestHandler.handle(request);
-        var response = new ImportPartitionMessageResponse(stepExecution);
+        var response = new ImportPartitionMessageResponse(stepExecution.getJobExecutionId(), stepExecution.getId());
         try {
             eventSender.sendEvent(response);
         } catch (final Exception e) {

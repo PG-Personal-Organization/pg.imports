@@ -35,8 +35,7 @@ public interface ImportPlugin<RECORD_DATA extends RecordData> {
     }
 
     @NonNull
-    default <RECORD extends RecordData, IN extends ParsedRecord<RecordData>, IN_PROVIDER extends ImportingRecordsProvider<IN>>
-    ImportingComponentsProvider<RECORD, IN, IN_PROVIDER> getImportingComponentsProvider() {
+    default <RECORD extends RecordData, IN extends ParsedRecord<RECORD>> ImportingComponentsProvider<RECORD, IN> getImportingComponentsProvider() {
         throw new NotImplementedException("Importing not implemented for plugin: " + getCode());
     }
 

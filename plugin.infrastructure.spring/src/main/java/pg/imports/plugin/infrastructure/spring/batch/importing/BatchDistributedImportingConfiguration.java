@@ -3,6 +3,7 @@ package pg.imports.plugin.infrastructure.spring.batch.importing;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.configuration.annotation.JobScope;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.integration.partition.StepExecutionRequestHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ public class BatchDistributedImportingConfiguration {
     private final RecordsRepository recordsRepository;
     private final EventSender eventSender;
     private final Environment environment;
+    private final JobExplorer jobExplorer;
 
     @Bean
     public MessageDestination importingChunkMessageRequestDestination() {
@@ -52,7 +54,7 @@ public class BatchDistributedImportingConfiguration {
 
     @Bean
     public DistributedImportPartitionResponseMessageHandler distributedImportPartitionResponseMessageHandler() {
-        return new DistributedImportPartitionResponseMessageHandler(importingReplies());
+        return new DistributedImportPartitionResponseMessageHandler(importingReplies(), jobExplorer);
     }
 
     @Bean

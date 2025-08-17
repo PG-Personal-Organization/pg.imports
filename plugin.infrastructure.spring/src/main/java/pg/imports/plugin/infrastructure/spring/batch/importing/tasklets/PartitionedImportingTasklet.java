@@ -10,8 +10,7 @@ import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.batch.importing.partition.ImportingPartitioner;
-import pg.imports.plugin.infrastructure.spring.batch.importing.readers.LibraryJsonImportingRecordsProvider;
-import pg.imports.plugin.infrastructure.spring.batch.importing.readers.MongoImportingRecordsProvider;
+import pg.imports.plugin.infrastructure.spring.batch.importing.records.provider.ImportingRecordsProviderFactory;
 
 import java.util.Collections;
 
@@ -21,9 +20,8 @@ public class PartitionedImportingTasklet extends ImportingTasklet {
     public PartitionedImportingTasklet(final ImportRepository importRepository,
                                        final PluginCache pluginCache,
                                        final RecordsRepository recordsRepository,
-                                       final LibraryJsonImportingRecordsProvider dbJsonRecordsProvider,
-                                       final MongoImportingRecordsProvider mongoRecordsProvider) {
-        super(importRepository, pluginCache, recordsRepository, dbJsonRecordsProvider, mongoRecordsProvider);
+                                       final ImportingRecordsProviderFactory importingRecordsProviderFactory) {
+        super(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory);
     }
 
     @Override

@@ -7,15 +7,18 @@ import pg.imports.plugin.api.strategies.db.RecordData;
 import java.util.Collections;
 import java.util.List;
 
-public interface ImportingComponentsProvider<RECORD extends RecordData, IN extends ParsedRecord<RecordData>, IN_PROVIDER extends ImportingRecordsProvider<IN>> {
+public interface ImportingComponentsProvider<RECORD extends RecordData, IN extends ParsedRecord<RECORD>> {
 
+    /**
+     * Used only for {@link pg.imports.plugin.api.strategies.RecordsStoringStrategy.PLUGIN_DATABASE}
+     * */
     @NonNull
-    default ImportingRecordsProvider<IN> getImportingRecordsProvider(List<String> recordIds) {
-        return records -> Collections.emptyList();
+    default ImportingRecordsProvider<IN> getPluginImportingRecordsProvider(List<String> successfulRecordIds) {
+        return Collections::emptyList;
     }
 
     @NonNull
-    RecordImporter<RECORD, IN, IN_PROVIDER> getRecordImporter();
+    RecordImporter<RECORD, IN> getRecordImporter();
 
     @NonNull
     default RecordsImportingErrorHandler getRecordsImportingErrorHandler() {
@@ -24,6 +27,12 @@ public interface ImportingComponentsProvider<RECORD extends RecordData, IN exten
 
     @NonNull
     default CompletedImportingCleaner getCompletedImportingCleaner() {
-        return (recordIds, errorRecordIds) -> { };
+        return new CompletedImportingCleaner() {
+            @Override
+            public void handleCleaningSuccessfulRecords(final @NonNull List<String> recordIds) { }
+
+            @Override
+            public void handleCleaningFailedRecords(final @NonNull List<String> errorRecordIds) { }
+        };
     }
 }

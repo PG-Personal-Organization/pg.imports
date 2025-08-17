@@ -17,13 +17,13 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
-import pg.kafka.sender.EventSender;
 import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition.DistributedImportPartitionRequestSender;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition.ImportPartitionMessageResponse;
 import pg.imports.plugin.infrastructure.spring.batch.importing.listeners.ImportingErrorJobListener;
 import pg.imports.plugin.infrastructure.spring.batch.importing.partition.ImportingPartitioner;
 import pg.imports.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListener;
+import pg.kafka.sender.EventSender;
 
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -94,7 +94,9 @@ public class DistributedImportingMasterConfiguration {
     public IntegrationFlow inboundPartitionReplies() {
         return IntegrationFlow
                 .from(partitionReplyInbound)
-                .transform(ImportPartitionMessageResponse::getStepExecution)
+                .<ImportPartitionMessageResponse, org.springframework.batch.core.StepExecution>transform(
+                        response -> jobExplorer.getStepExecution(response.getJobExecutionId(), response.getStepExecutionId())
+                )
                 .channel(importingReplies)
                 .get();
     }

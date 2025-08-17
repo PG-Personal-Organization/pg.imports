@@ -9,12 +9,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -25,10 +25,10 @@ import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportStatus;
 import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.records.RecordsStatus;
 
 import java.io.InputStream;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -40,8 +40,8 @@ import static org.awaitility.Awaitility.await;
 @ImportsIntegrationTest
 @EmbeddedKafka(brokerProperties = {"transaction.max.timeout.ms=3600000"})
 @Testcontainers
-@Transactional
 @RequiredArgsConstructor(onConstructor_ = @__(@Autowired))
+@Transactional
 class TestPluginIntegrationTest {
     private final ImportRepository importRepository;
     private final RecordsRepository recordsRepository;
@@ -80,7 +80,7 @@ class TestPluginIntegrationTest {
     @MethodSource("shouldParseRecordsCorrectlyData")
     @ParameterizedTest
     @SneakyThrows
-    void shouldParseRecordsCorrectly(final String pluginCode, final String fileName, final int expectedPartitionsCount, final int expectedRecordsCount) {
+    void shouldParseAndImportRecordsCorrectly(final String pluginCode, final String fileName, final int expectedPartitionsCount, final int expectedRecordsCount) {
         // given
         String file = "test/data/" + fileName;
         try (InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream(file)) {
@@ -98,7 +98,6 @@ class TestPluginIntegrationTest {
             // when
             var importId = RestAssured
                     .given()
-                    .param("fileId", fileId)
 
                     .when()
                     .post("/api/v1/imports/start/{fileId}/{pluginCode}", fileId, pluginCode)
@@ -121,14 +120,50 @@ class TestPluginIntegrationTest {
                     });
 
             if (status.get() == null || status.get() == ImportStatus.PARSING_FAILED) {
-                throw new RuntimeException("Import with id " + importId.id() + " failed.");
+                throw new RuntimeException("Import with id " + importId.id() + " failed parsing.");
             }
 
             var partitions = recordsRepository.findAllByParentImportId(importId.id());
             Assertions.assertEquals(expectedPartitionsCount, partitions.size());
+            Assertions.assertTrue(partitions.stream().allMatch(importRecordsEntity -> importRecordsEntity.getRecordsStatus().equals(RecordsStatus.PARSED)));
             Assertions.assertEquals(expectedRecordsCount, partitions.stream().mapToLong(importRecordsEntity -> importRecordsEntity.getRecordIds().size()).sum());
 
-            System.out.println("Import with id finished in: " + Duration.between(importEntity.get().getStartedParsingOn(), importEntity.get().getEndedParsingOn()).getSeconds());
+            System.out.println("\n\nImport parsing with id finished in: "
+                    + Duration.between(importEntity.get().getStartedParsingOn(), importEntity.get().getEndedParsingOn()).toMillis() + " ms.\n\n");
+
+            TestTransaction.flagForCommit();
+            TestTransaction.end();
+            TestTransaction.start();
+
+            // when
+            RestAssured
+                    .given()
+
+                    .when()
+                    .post("/api/v1/imports/confirm/{importId}", importId.id())
+
+                    .then()
+                    .statusCode(200);
+
+            await()
+                    .atMost(30, TimeUnit.SECONDS)
+                    .pollInterval(5, TimeUnit.SECONDS)
+                    .until(() -> {
+                        var entity = importRepository.findByIdAndStatusIn(importId.id(), List.of(ImportStatus.IMPORTING_COMPLETED, ImportStatus.IMPORTING_FAILED));
+                        status.set(entity.map(ImportEntity::getStatus).orElse(null));
+                        importEntity.set(entity.orElse(null));
+                        return entity.isPresent();
+                    });
+
+            if (status.get() == null || status.get() == ImportStatus.IMPORTING_FAILED) {
+                throw new RuntimeException("Import with id " + importId.id() + " failed importing.");
+            }
+
+            partitions = recordsRepository.findAllByParentImportId(importId.id());
+            Assertions.assertTrue(partitions.stream().allMatch(importRecordsEntity -> importRecordsEntity.getRecordsStatus().equals(RecordsStatus.IMPORTED)));
+
+            System.out.println("\n\nImport importing with id finished in: "
+                    + Duration.between(importEntity.get().getStartedImportingOn(), importEntity.get().getFinishedImportingOn()).toMillis() + " ms.\n\n");
         }
     }
 

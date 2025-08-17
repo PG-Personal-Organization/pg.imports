@@ -1,4 +1,4 @@
-package pg.imports.tests.data;
+package pg.imports.tests.data.common.parsing;
 
 import lombok.NonNull;
 import pg.imports.plugin.api.data.ImportContext;
@@ -7,6 +7,7 @@ import pg.imports.plugin.api.parsing.ParsedRecord;
 import pg.imports.plugin.api.parsing.ReadOnlyParsedRecord;
 import pg.imports.plugin.api.parsing.ReaderOutputItem;
 import pg.imports.plugin.api.parsing.RecordParser;
+import pg.imports.tests.data.common.TestRecord;
 
 import java.util.Collections;
 

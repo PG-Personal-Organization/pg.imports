@@ -57,7 +57,11 @@ pg:
     consumer-configs:
       imports-test-chunk-request-processing-batch-topic:
         concurrency: 6
+      imports-test-chunk-request-importing-batch-topic:
+        concurrency: 6
       imports-test-chunk-response-processing-batch-topic:
+        concurrency: 12
+      imports-test-chunk-response-importing-batch-topic:
         concurrency: 12
     # bootstrap-server: localhost:9092
   imports:

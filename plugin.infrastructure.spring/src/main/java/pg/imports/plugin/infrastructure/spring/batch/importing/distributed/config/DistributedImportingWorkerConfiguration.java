@@ -1,13 +1,16 @@
 package pg.imports.plugin.infrastructure.spring.batch.importing.distributed.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.integration.partition.BeanFactoryStepLocator;
 import org.springframework.batch.integration.partition.StepExecutionRequestHandler;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +29,6 @@ public class DistributedImportingWorkerConfiguration {
 
     private final Tasklet partitionedImportingTasklet;
     private final JobExplorer jobExplorer;
-    private final StepLocator distributedImportingJob;
 
     private final MessageChannel partitionRequestInbound;
 
@@ -40,20 +42,30 @@ public class DistributedImportingWorkerConfiguration {
     }
 
     @Bean
-    public StepExecutionRequestHandler stepExecutionRequestHandler() {
+    public StepLocator workerStepLocator(final BeanFactory beanFactory) {
+        BeanFactoryStepLocator locator = new BeanFactoryStepLocator();
+        locator.setBeanFactory(beanFactory);
+        return locator;
+    }
+
+    @Bean
+    public StepExecutionRequestHandler stepExecutionRequestHandler(final StepLocator workerStepLocator) {
         StepExecutionRequestHandler handler = new StepExecutionRequestHandler();
         handler.setJobExplorer(jobExplorer);
-        handler.setStepLocator(distributedImportingJob);
+        handler.setStepLocator(workerStepLocator);
         return handler;
     }
 
     @Bean
-    public IntegrationFlow inboundRequestsFlow() {
+    public IntegrationFlow inboundRequestsFlow(final StepExecutionRequestHandler stepExecutionRequestHandler) {
         return IntegrationFlow
                 .from(partitionRequestInbound)
                 .transform(ImportPartitionMessageRequest::getRequest)
-                .handle(stepExecutionRequestHandler())
-                .transform(ImportPartitionMessageResponse::new)
+                .handle(stepExecutionRequestHandler)
+                .transform(execution -> {
+                    var stepExecution = (StepExecution) execution;
+                    return new ImportPartitionMessageResponse(stepExecution.getJobExecutionId(), stepExecution.getId());
+                })
                 .handle(distributedImportPartitionResponseSender)
                 .get();
     }

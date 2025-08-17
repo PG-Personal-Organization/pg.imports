@@ -1,10 +1,16 @@
 package pg.imports.plugin.api.importing;
 
-import pg.imports.plugin.api.strategies.db.RecordData;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.Optional;
 
-public interface ImportingResult<RECORD extends RecordData> {
+@AllArgsConstructor(staticName = "error")
+@NoArgsConstructor(staticName = "success")
+public class ImportingResult {
+    private String importingErrorCode;
 
-    Optional<String> importingErrorCode();
+    public Optional<String> getImportingErrorCode() {
+        return Optional.ofNullable(importingErrorCode);
+    }
 }

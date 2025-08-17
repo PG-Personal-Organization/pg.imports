@@ -1,4 +1,4 @@
-package pg.imports.plugin.infrastructure.spring.batch.importing.readers;
+package pg.imports.plugin.infrastructure.spring.batch.importing.records.provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,10 @@ import java.util.stream.Collectors;
 public class LibraryJsonImportingRecordsProvider implements ImportingRecordsProvider<ReadOnlyParsedRecord<RecordData>> {
     private final RecordRepository recordRepository;
     private final ObjectMapper batchObjectMapper;
+    private final List<String> recordIds;
 
     @Override
-    public List<ReadOnlyParsedRecord<RecordData>> getRecords(final List<String> recordIds) {
+    public List<ReadOnlyParsedRecord<RecordData>> getRecords() {
         List<UUID> uuidIds = recordIds.stream()
                 .map(UUID::fromString)
                 .toList();

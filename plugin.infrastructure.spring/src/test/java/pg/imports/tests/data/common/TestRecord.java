@@ -1,4 +1,4 @@
-package pg.imports.tests.data;
+package pg.imports.tests.data.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

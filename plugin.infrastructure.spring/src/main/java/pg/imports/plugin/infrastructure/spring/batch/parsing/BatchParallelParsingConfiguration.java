@@ -70,7 +70,7 @@ public class BatchParallelParsingConfiguration {
         t.setCorePoolSize(corePoolSize);
         t.setMaxPoolSize(maxPoolSize);
         t.setQueueCapacity(Math.max(maxPoolSize * 2, QUEUE_LIMIT));
-        t.setThreadNamePrefix("parallel-imports-parsing-");
+        t.setThreadNamePrefix("parallel-imports-parser-");
         t.initialize();
         return t;
     }

@@ -27,6 +27,7 @@ public class BatchParallelImportingConfiguration {
     private static final String WORKER_STEP_NAME = "parallelImportingWorkerStep";
     private static final String PARTITIONED_STEP_NAME = "parallelImportingStep";
     private static final int IMPORTING_STEP_TRANSACTION_TIMEOUT = 3600;
+    private static final int QUEUE_LIMIT = 500;
 
     @Value("${batch.parallel.importing.corePoolSize:4}")
     private int corePoolSize;
@@ -87,7 +88,7 @@ public class BatchParallelImportingConfiguration {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(corePoolSize);
         executor.setMaxPoolSize(maxPoolSize);
-        executor.setQueueCapacity(maxPoolSize);
+        executor.setQueueCapacity(Math.max(maxPoolSize * 2, QUEUE_LIMIT));
         executor.setThreadNamePrefix("parallel-imports-importer-");
         executor.initialize();
         return executor;

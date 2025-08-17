@@ -1,20 +1,17 @@
 package pg.imports.tests.data;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import pg.imports.plugin.api.ImportPlugin;
 import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.api.importing.ImportingComponentsProvider;
-import pg.imports.plugin.api.importing.ImportingRecordsProvider;
 import pg.imports.plugin.api.parsing.ParsedRecord;
 import pg.imports.plugin.api.parsing.ParsingComponentsProvider;
-import pg.imports.plugin.api.strategies.db.RecordData;
+import pg.imports.tests.data.common.TestRecord;
 
-@RequiredArgsConstructor
-public class ParallelTestPlugin implements ImportPlugin<TestRecord> {
-
-    private final ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> parsingProvider;
-    private final ImportingComponentsProvider<TestRecord, ParsedRecord<RecordData>, ImportingRecordsProvider<ParsedRecord<RecordData>>> importingProvider;
+public class ParallelTestPlugin extends TestPlugin {
+    public ParallelTestPlugin(final ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> parsingProvider,
+                                 final ImportingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> importingProvider) {
+        super(parsingProvider, importingProvider);
+    }
 
     @NonNull
     @Override
@@ -24,35 +21,8 @@ public class ParallelTestPlugin implements ImportPlugin<TestRecord> {
 
     @NonNull
     @Override
-    public String getVersion() {
-        return "1.0.0";
-    }
-
-    @NonNull
-    @Override
     public String getCodeIdPrefix() {
         return "PARALLEL";
     }
 
-    @Override
-    public int getChunkSize() {
-        return 200;
-    }
-
-    @NonNull
-    @Override
-    public ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> getParsingComponentProvider() {
-        return parsingProvider;
-    }
-
-    @NonNull
-    @Override
-    public ImportingComponentsProvider<TestRecord, ParsedRecord<RecordData>, ImportingRecordsProvider<ParsedRecord<RecordData>>> getImportingComponentsProvider() {
-        return importingProvider;
-    }
-
-    @Override
-    public Class<? extends RecordData> getRecordClass() {
-        return TestRecord.class;
-    }
 }

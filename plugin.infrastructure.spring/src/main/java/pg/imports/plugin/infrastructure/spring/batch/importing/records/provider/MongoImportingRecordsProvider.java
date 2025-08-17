@@ -1,4 +1,4 @@
-package pg.imports.plugin.infrastructure.spring.batch.importing.readers;
+package pg.imports.plugin.infrastructure.spring.batch.importing.records.provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +16,11 @@ import java.util.stream.Collectors;
 public class MongoImportingRecordsProvider implements ImportingRecordsProvider<ReadOnlyParsedRecord<RecordData>> {
     private final MongoRecordRepository recordRepository;
     private final ObjectMapper batchObjectMapper;
+    private final List<String> recordIds;
 
     @Override
     @SneakyThrows
-    public List<ReadOnlyParsedRecord<RecordData>> getRecords(final List<String> recordIds) {
+    public List<ReadOnlyParsedRecord<RecordData>> getRecords() {
         var uuidIds = recordIds.stream()
                 .map(UUID::fromString)
                 .toList();

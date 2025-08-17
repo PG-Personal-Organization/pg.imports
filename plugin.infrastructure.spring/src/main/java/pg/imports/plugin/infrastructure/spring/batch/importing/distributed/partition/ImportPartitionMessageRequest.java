@@ -1,9 +1,6 @@
 package pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.batch.integration.partition.StepExecutionRequest;
 import pg.kafka.message.Message;
 
@@ -11,6 +8,7 @@ import pg.kafka.message.Message;
 @ToString
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ImportPartitionMessageRequest extends Message {
-    private final StepExecutionRequest request;
+    private StepExecutionRequest request;
 }

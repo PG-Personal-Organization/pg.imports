@@ -1,10 +1,11 @@
-package pg.imports.tests.data;
+package pg.imports.tests.data.common.parsing;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.beanio.builder.CsvParserBuilder;
 import org.beanio.builder.StreamBuilder;
 import pg.imports.plugin.api.parsing.*;
+import pg.imports.tests.data.common.TestRecord;
 
 @RequiredArgsConstructor
 public class TestParsingComponentsProvider implements ParsingComponentsProvider<TestRecord, ParsedRecord<TestRecord>> {

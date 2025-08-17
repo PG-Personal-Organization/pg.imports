@@ -31,6 +31,9 @@ public class ImportRecordsEntity {
 
     private LocalDateTime finishedImportingOn;
 
+    @Enumerated(EnumType.STRING)
+    private RecordsStatus recordsStatus;
+
     @ElementCollection
     private Set<String> recordIds = new HashSet<>();
 
@@ -87,6 +90,7 @@ public class ImportRecordsEntity {
                 .count(recordIds.size())
                 .errorCount(errorRecordIds.size())
                 .finishedParsingOn(LocalDateTime.now())
+                .recordsStatus(RecordsStatus.PARSED)
                 .strategy(strategy)
                 .build();
     }
