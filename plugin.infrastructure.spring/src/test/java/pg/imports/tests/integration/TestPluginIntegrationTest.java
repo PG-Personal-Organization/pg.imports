@@ -179,6 +179,11 @@ class TestPluginIntegrationTest {
                 Arguments.of("PARALLEL", "import_2000.csv", 10, 2000),
                 Arguments.of("PARALLEL", "import_10000.csv", 50, 10000),
 
+                Arguments.of("PARALLEL_MONGO", "import_500.csv", 3, 500),
+                Arguments.of("PARALLEL_MONGO", "import_1000.csv", 5, 1000),
+                Arguments.of("PARALLEL_MONGO", "import_2000.csv", 10, 2000),
+                Arguments.of("PARALLEL_MONGO", "import_10000.csv", 50, 10000),
+
                 Arguments.of("DISTRIBUTED", "import_500.csv", 3, 500),
                 Arguments.of("DISTRIBUTED", "import_1000.csv", 5, 1000),
                 Arguments.of("DISTRIBUTED", "import_2000.csv", 10, 2000),

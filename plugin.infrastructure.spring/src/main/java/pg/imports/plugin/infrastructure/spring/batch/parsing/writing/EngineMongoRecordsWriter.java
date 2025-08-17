@@ -8,8 +8,8 @@ import lombok.extern.log4j.Log4j2;
 import pg.imports.plugin.api.ImportPlugin;
 import pg.imports.plugin.api.data.ImportContext;
 import pg.imports.plugin.api.data.ImportRecordStatus;
-import pg.imports.plugin.api.writing.WrittenRecords;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
+import pg.imports.plugin.api.writing.WrittenRecords;
 import pg.imports.plugin.infrastructure.persistence.records.mongo.MongoRecordRepository;
 import pg.imports.plugin.infrastructure.persistence.records.mongo.RecordDocument;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.PartitionedRecord;
@@ -36,17 +36,26 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
             var importedRecord = partitionedRecord.getParsedRecord();
             try {
                 return RecordDocument.builder()
+                        .id(UUID.randomUUID())
                         .importId(importedRecord.getImportId())
                         .recordStatus(importedRecord.getRecordStatus())
                         .ordinal(Math.toIntExact(importedRecord.getOrdinal()))
                         .recordData(batchObjectMapper.writeValueAsString(importedRecord.getRecord()))
-                        .recordDataClass(plugin.getRecordClass())
+                        .recordDataClass(plugin.getRecordClass().getName())
                         .partitionId(partitionedRecord.getPartitionId())
                         .errorMessages(String.join("\n", importedRecord.getErrorMessages()))
                         .build();
             } catch (JsonProcessingException e) {
                 log.error("Error during converting record: {} to mongo storage document", partitionedRecord,  e);
-                return RecordDocument.builder().build();
+                return RecordDocument.builder()
+                        .id(UUID.randomUUID())
+                        .importId(importedRecord.getImportId())
+                        .recordStatus(ImportRecordStatus.PARSING_FAILED)
+                        .ordinal(Math.toIntExact(importedRecord.getOrdinal()))
+                        .recordDataClass(plugin.getRecordClass().getName())
+                        .partitionId(partitionedRecord.getPartitionId())
+                        .errorMessages(e.getMessage())
+                        .build();
             }
         }).toList();
         recordRepository.saveAll(recordsToWrite);

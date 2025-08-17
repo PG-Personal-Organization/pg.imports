@@ -77,17 +77,20 @@ pg:
     plugins-import-strategy:
       SIMPLE: local
       PARALLEL: local_parallel
+      PARALLEL_MONGO: local_parallel
       DISTRIBUTED: distributed
 
     plugins-parsing-strategy:
       SIMPLE: local
       PARALLEL: local_parallel
+      PARALLEL_MONGO: local_parallel
       DISTRIBUTED: distributed
 
     pluginsDatabaseRecordsStoring:
       SIMPLE: library_json_database
       PARALLEL: library_json_database
       DISTRIBUTED: library_json_database
+      PARALLEL_MONGO: mongo_repository
     auto-start-importing-enabled: false
 
     batch:

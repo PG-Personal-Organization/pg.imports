@@ -56,6 +56,11 @@ public class ImportsTestConfiguration {
     }
 
     @Bean
+    public ParallelMongoTestPlugin parallelMongoTestPlugin() {
+        return new ParallelMongoTestPlugin(testParsingComponentsProvider(), testImportingComponentsProvider());
+    }
+
+    @Bean
     public DistributedTestPlugin distributedTestPlugin() {
         return new DistributedTestPlugin(testParsingComponentsProvider(), testImportingComponentsProvider());
     }
