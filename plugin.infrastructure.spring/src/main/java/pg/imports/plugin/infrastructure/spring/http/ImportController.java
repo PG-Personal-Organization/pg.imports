@@ -13,7 +13,7 @@ import pg.imports.plugin.api.service.ImportingHelper;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "api/v1/imports")
+@RequestMapping(path = ImportsHttpPaths.BASE_PATH)
 @AllArgsConstructor
 @Tag(name = "Imports")
 public class ImportController {
