@@ -17,7 +17,6 @@ import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.Partition
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWriterManager.ERROR_STATUSES;
@@ -33,11 +32,11 @@ public class EngineDbRecordsWriter implements RecordsWriter {
     @Override
     public @NonNull WrittenRecords write(final List<PartitionedRecord> records, final ImportContext importContext, final ImportPlugin plugin) {
         log.info("Writing {} records of type: {} to import database storage", records.size(), plugin.getRecordClass());
-        // TODO verify if batchObjectMapper is better serializer for dynamic data in recordData
         var recordsToWrite = records.stream().map(partitionedRecord -> {
             var importedRecord = partitionedRecord.getParsedRecord();
             JsonNode jsonData = batchObjectMapper.valueToTree(importedRecord.getRecord());
             return RecordEntity.builder()
+                    .id(importedRecord.getRecordId())
                     .importId(importedRecord.getImportId())
                     .recordStatus(importedRecord.getRecordStatus())
                     .ordinal(Math.toIntExact(importedRecord.getOrdinal()))
@@ -58,7 +57,7 @@ public class EngineDbRecordsWriter implements RecordsWriter {
         var errorMessages = recordsByStatus.entrySet().stream()
                 .filter(entry -> ERROR_STATUSES.contains(entry.getKey()))
                 .flatMap(entry -> entry.getValue().stream())
-                .collect(Collectors.toMap(r -> r.getId().toString(), RecordEntity::getErrorMessages, (l, r) -> l));
+                .collect(Collectors.toMap(RecordEntity::getId, RecordEntity::getErrorMessages, (l, r) -> l));
 
         return new WrittenRecords(getRecordIdsByStatus(recordsByStatus, SUCCESS_STATUSES), getRecordIdsByStatus(recordsByStatus, ERROR_STATUSES), errorMessages);
     }
@@ -68,7 +67,6 @@ public class EngineDbRecordsWriter implements RecordsWriter {
                 .filter(entry -> statuses.contains(entry.getKey()))
                 .flatMap(entry -> entry.getValue().stream())
                 .map(RecordEntity::getId)
-                .map(UUID::toString)
                 .toList();
     }
 

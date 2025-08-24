@@ -21,15 +21,10 @@ public class MongoImportingRecordsProvider implements ImportingRecordsProvider<R
     @Override
     @SneakyThrows
     public List<ReadOnlyParsedRecord<RecordData>> getRecords() {
-        var ids = recordIds.stream()
-                .map(UUID::fromString)
-                .toList();
-
-        Map<UUID, RecordDocument> recordDocuments = recordRepository.findAllById(ids).stream()
+        Map<String, RecordDocument> recordDocuments = recordRepository.findAllById(recordIds).stream()
                 .collect(Collectors.toMap(RecordDocument::getId, document -> document));
 
         return recordIds.stream()
-                .map(UUID::fromString)
                 .map(recordDocuments::get)
                 .filter(Objects::nonNull)
                 .map(this::toParsedRecord)
@@ -40,7 +35,7 @@ public class MongoImportingRecordsProvider implements ImportingRecordsProvider<R
     private ReadOnlyParsedRecord<RecordData> toParsedRecord(final RecordDocument recordDocument) {
         return ReadOnlyParsedRecord.builder()
                 .importId(recordDocument.getImportId())
-                .id(recordDocument.getId().toString())
+                .recordId(recordDocument.getId())
                 .recordData((RecordData) batchObjectMapper.readValue(recordDocument.getRecordData(), Class.forName(recordDocument.getRecordDataClass())))
                 .recordStatus(recordDocument.getRecordStatus())
                 .ordinal(recordDocument.getOrdinal())

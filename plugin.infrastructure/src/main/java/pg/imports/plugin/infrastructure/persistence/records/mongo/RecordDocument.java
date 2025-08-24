@@ -1,7 +1,5 @@
 package pg.imports.plugin.infrastructure.persistence.records.mongo;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import pg.imports.plugin.api.data.ImportRecordStatus;
 import pg.imports.plugin.api.strategies.mongo.LibraryMongoStoredRecordsPlugin;
 
-import java.util.UUID;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,8 +17,7 @@ import java.util.UUID;
 @Document(collection = "import_records")
 public class RecordDocument {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     private String importId;
 

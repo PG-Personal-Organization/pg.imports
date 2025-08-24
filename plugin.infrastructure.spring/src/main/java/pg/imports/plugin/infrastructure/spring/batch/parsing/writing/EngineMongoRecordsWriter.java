@@ -17,7 +17,6 @@ import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.Partition
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWriterManager.ERROR_STATUSES;
@@ -36,7 +35,7 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
             var importedRecord = partitionedRecord.getParsedRecord();
             try {
                 return RecordDocument.builder()
-                        .id(UUID.randomUUID())
+                        .id(importedRecord.getRecordId())
                         .importId(importedRecord.getImportId())
                         .recordStatus(importedRecord.getRecordStatus())
                         .ordinal(Math.toIntExact(importedRecord.getOrdinal()))
@@ -48,7 +47,7 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
             } catch (JsonProcessingException e) {
                 log.error("Error during converting record: {} to mongo storage document", partitionedRecord,  e);
                 return RecordDocument.builder()
-                        .id(UUID.randomUUID())
+                        .id(importedRecord.getRecordId())
                         .importId(importedRecord.getImportId())
                         .recordStatus(ImportRecordStatus.PARSING_FAILED)
                         .ordinal(Math.toIntExact(importedRecord.getOrdinal()))
@@ -69,7 +68,7 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
         var errorMessages = recordsByStatus.entrySet().stream()
                 .filter(entry -> ERROR_STATUSES.contains(entry.getKey()))
                 .flatMap(entry -> entry.getValue().stream())
-                .collect(Collectors.toMap(r -> r.getId().toString(), RecordDocument::getErrorMessages, (l, r) -> l));
+                .collect(Collectors.toMap(RecordDocument::getId, RecordDocument::getErrorMessages, (l, r) -> l));
 
         return new WrittenRecords(getRecordIdsByStatus(recordsByStatus, SUCCESS_STATUSES), getRecordIdsByStatus(recordsByStatus, ERROR_STATUSES), errorMessages);
     }
@@ -79,7 +78,6 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
                 .filter(entry -> statuses.contains(entry.getKey()))
                 .flatMap(entry -> entry.getValue().stream())
                 .map(RecordDocument::getId)
-                .map(UUID::toString)
                 .toList();
     }
 

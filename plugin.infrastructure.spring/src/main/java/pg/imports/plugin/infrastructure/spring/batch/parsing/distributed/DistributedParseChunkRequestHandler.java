@@ -27,7 +27,6 @@ public class DistributedParseChunkRequestHandler implements MessageHandler<Parse
     private final PluginCache pluginCache;
 
     @Override
-    @SuppressWarnings("unchecked")
     public void handleMessage(final @NonNull ParseChunkMessageRequest message) {
         try {
             Class<?> recordClazz = pluginCache.getPlugin(message.getImportContext().getPluginCode()).getRecordClass();

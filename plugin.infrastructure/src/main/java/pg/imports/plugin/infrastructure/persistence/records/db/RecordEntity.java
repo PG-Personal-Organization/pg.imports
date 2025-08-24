@@ -8,7 +8,6 @@ import org.hibernate.type.SqlTypes;
 import pg.imports.plugin.api.data.ImportRecordStatus;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity(name = "records")
 @Getter
@@ -19,8 +18,7 @@ import java.util.UUID;
 @ToString
 public class RecordEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     private String importId;
 

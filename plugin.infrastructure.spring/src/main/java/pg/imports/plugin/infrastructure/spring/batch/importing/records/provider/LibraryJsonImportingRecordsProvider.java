@@ -9,7 +9,10 @@ import pg.imports.plugin.api.strategies.db.RecordData;
 import pg.imports.plugin.infrastructure.persistence.records.db.RecordEntity;
 import pg.imports.plugin.infrastructure.persistence.records.db.RecordRepository;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -20,15 +23,10 @@ public class LibraryJsonImportingRecordsProvider implements ImportingRecordsProv
 
     @Override
     public List<ReadOnlyParsedRecord<RecordData>> getRecords() {
-        List<UUID> uuidIds = recordIds.stream()
-                .map(UUID::fromString)
-                .toList();
-
-        Map<UUID, RecordEntity> recordEntities = recordRepository.findAllById(uuidIds).stream()
+        Map<String, RecordEntity> recordEntities = recordRepository.findAllById(recordIds).stream()
                 .collect(Collectors.toMap(RecordEntity::getId, entity -> entity));
 
         return recordIds.stream()
-                .map(UUID::fromString)
                 .map(recordEntities::get)
                 .filter(Objects::nonNull)
                 .map(this::toParsedRecord)
@@ -41,7 +39,7 @@ public class LibraryJsonImportingRecordsProvider implements ImportingRecordsProv
         RecordData data = (RecordData) batchObjectMapper.treeToValue(recordEntity.getRecordData(), clazz);
         return ReadOnlyParsedRecord.builder()
                 .importId(recordEntity.getImportId())
-                .id(recordEntity.getId().toString())
+                .recordId(recordEntity.getId())
                 .recordData(data)
                 .recordStatus(recordEntity.getRecordStatus())
                 .ordinal(recordEntity.getOrdinal())

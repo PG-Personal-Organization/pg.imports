@@ -29,7 +29,7 @@ public class BeanIoReader extends BeanIOFlatFileItemReader<ReaderOutputItem<Obje
             int chunkNumber = getChunkNumber();
             String partitionId = calculatePartitionId(chunkNumber);
             return ReaderOutputItem.builder()
-                    .id(UUID.randomUUID().toString())
+                    .id(importPlugin.getRecordsPrefix() + UUID.randomUUID())
                     .itemNumber(currentItemCount)
                     .rawItem(record)
                     .partitionId(partitionId)

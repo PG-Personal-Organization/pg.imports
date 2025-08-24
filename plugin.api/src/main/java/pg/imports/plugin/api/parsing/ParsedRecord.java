@@ -9,6 +9,8 @@ import java.util.List;
 public interface ParsedRecord<T extends RecordData> extends Serializable {
     T getRecord();
 
+    String getRecordId();
+
     String getImportId();
 
     Long getOrdinal();

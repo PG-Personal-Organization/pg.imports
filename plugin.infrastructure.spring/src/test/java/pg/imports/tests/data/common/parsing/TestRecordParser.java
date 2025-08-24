@@ -20,6 +20,7 @@ public class TestRecordParser implements RecordParser<TestRecord, ParsedRecord<T
         try {
             TestRecord data = (TestRecord) item.getRawItem();
             return ReadOnlyParsedRecord.<TestRecord>builder()
+                    .recordId(item.getId())
                     .importId(importId.id())
                     .recordData(data)
                     .ordinal(item.getItemNumber())
@@ -28,6 +29,7 @@ public class TestRecordParser implements RecordParser<TestRecord, ParsedRecord<T
                     .build();
         } catch (final Exception e) {
             return ReadOnlyParsedRecord.<TestRecord>builder()
+                    .recordId(item.getId())
                     .importId(importId.id())
                     .recordData(null)
                     .ordinal(item.getItemNumber())

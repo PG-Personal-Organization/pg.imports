@@ -1,14 +1,10 @@
 package pg.imports.tests.data;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import pg.imports.plugin.api.ImportPlugin;
 import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.api.importing.ImportingComponentsProvider;
-import pg.imports.plugin.api.importing.ImportingRecordsProvider;
 import pg.imports.plugin.api.parsing.ParsedRecord;
 import pg.imports.plugin.api.parsing.ParsingComponentsProvider;
-import pg.imports.plugin.api.strategies.db.RecordData;
 import pg.imports.tests.data.common.TestRecord;
 
 public class DistributedTestPlugin extends TestPlugin {

@@ -3,7 +3,6 @@ package pg.imports.tests.data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import pg.imports.plugin.api.ImportPlugin;
-import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.api.importing.ImportingComponentsProvider;
 import pg.imports.plugin.api.parsing.ParsedRecord;
 import pg.imports.plugin.api.parsing.ParsingComponentsProvider;

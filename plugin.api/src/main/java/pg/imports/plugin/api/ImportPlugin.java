@@ -4,7 +4,6 @@ import lombok.NonNull;
 import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.api.errors.NotImplementedException;
 import pg.imports.plugin.api.importing.ImportingComponentsProvider;
-import pg.imports.plugin.api.importing.ImportingRecordsProvider;
 import pg.imports.plugin.api.parsing.ParsedRecord;
 import pg.imports.plugin.api.parsing.ParsingComponentsProvider;
 import pg.imports.plugin.api.strategies.db.RecordData;
@@ -21,6 +20,11 @@ public interface ImportPlugin<RECORD_DATA extends RecordData> {
     @NonNull
     String getCodeIdPrefix();
 
+    @NonNull
+    default String getRecordsPrefix() {
+        return getCodeIdPrefix() + "_";
+    }
+
     default int getChunkSize() {
         return BASIC_CHUNK;
     }
@@ -30,7 +34,7 @@ public interface ImportPlugin<RECORD_DATA extends RecordData> {
     }
 
     @NonNull
-    default <OUT extends ParsedRecord<RECORD_DATA>> ParsingComponentsProvider<RECORD_DATA, OUT> getParsingComponentProvider() {
+    default ParsingComponentsProvider<RECORD_DATA, ? extends ParsedRecord<RECORD_DATA>> getParsingComponentProvider() {
         throw new NotImplementedException("Parsing not implemented for plugin: " + getCode());
     }
 
