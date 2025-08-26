@@ -76,7 +76,7 @@ class TestPluginMockTest {
         // when & then
         assertEquals("1.0.0", simpleTestPlugin.getVersion());
         assertEquals("SIMPLE", simpleTestPlugin.getCodeIdPrefix());
-        assertEquals(10, simpleTestPlugin.getChunkSize());
+        assertEquals(200, simpleTestPlugin.getChunkSize());
         assertEquals(TestRecord.class, simpleTestPlugin.getRecordClass());
     }
 }
