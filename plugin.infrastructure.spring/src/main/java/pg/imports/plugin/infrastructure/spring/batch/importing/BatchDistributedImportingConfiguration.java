@@ -29,6 +29,7 @@ import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.parti
 import pg.imports.plugin.infrastructure.spring.batch.importing.partition.ImportingPartitioner;
 import pg.kafka.message.MessageDestination;
 import pg.kafka.sender.EventSender;
+import pg.kafka.topic.TopicDefinition;
 import pg.kafka.topic.TopicName;
 
 @Configuration
@@ -38,14 +39,25 @@ import pg.kafka.topic.TopicName;
 })
 @RequiredArgsConstructor(onConstructor_ = @__({@Autowired, @Lazy}))
 public class BatchDistributedImportingConfiguration {
+    private static final int DEFAULT_PARTITIONS = 16;
+
     private final RecordsRepository recordsRepository;
     private final EventSender eventSender;
     private final Environment environment;
     private final JobExplorer jobExplorer;
 
     @Bean
+    public TopicDefinition importingChunkMessageRequestTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-chunk-request-importing-batch-topic"))
+                .partitions(DEFAULT_PARTITIONS)
+                .build();
+    }
+
+    @Bean
     public MessageDestination importingChunkMessageRequestDestination() {
-        var applicationName = environment.getProperty("spring.application.name");
+        var applicationName = getApplicationName();
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-request-importing-batch-topic"))
                 .messageClass(ImportPartitionMessageRequest.class)
@@ -58,8 +70,17 @@ public class BatchDistributedImportingConfiguration {
     }
 
     @Bean
+    public TopicDefinition importingChunkMessageResponseTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-chunk-response-importing-batch-topic"))
+                .partitions(DEFAULT_PARTITIONS)
+                .build();
+    }
+
+    @Bean
     public MessageDestination importingChunkMessageResponseDestination() {
-        var applicationName = environment.getProperty("spring.application.name");
+        var applicationName = getApplicationName();
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-response-importing-batch-topic"))
                 .messageClass(ImportPartitionMessageResponse.class)
@@ -107,5 +128,9 @@ public class BatchDistributedImportingConfiguration {
     public ImportingPartitioner importingPartitioner(final @Value("#{jobExecution}") JobExecution jobExecution) {
         var importContext = JobUtil.getImportContext(jobExecution);
         return new ImportingPartitioner(recordsRepository, importContext.getImportId());
+    }
+
+    private String getApplicationName() {
+        return environment.getProperty("spring.application.name");
     }
 }

@@ -20,6 +20,7 @@ import pg.imports.plugin.infrastructure.parsing.RejectedImportParsingMessageHand
 import pg.imports.plugin.infrastructure.parsing.ScheduledImportParsingMessageHandler;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
+import pg.kafka.topic.TopicDefinition;
 import pg.kafka.topic.TopicName;
 
 @Import({
@@ -29,6 +30,14 @@ import pg.kafka.topic.TopicName;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class KafkaConfiguration {
     private final Environment environment;
+
+    @Bean
+    public TopicDefinition scheduledImportsParsingTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-scheduled-imports-parsing-topic"))
+                .build();
+    }
 
     @Bean
     public MessageDestination scheduledImportsParsingMessageDestination() {
@@ -47,6 +56,14 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    public TopicDefinition rejectedImportsParsingTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-rejected-imports-parsing-topic"))
+                .build();
+    }
+
+    @Bean
     public MessageDestination rejectedImportsParsingMessageDestination() {
         var applicationName = getApplicationName();
         return MessageDestination.builder()
@@ -59,6 +76,14 @@ public class KafkaConfiguration {
     public RejectedImportParsingMessageHandler rejectedImportsMessageHandler(final ImportRepository importRepository,
                                                                              final PluginCache pluginCache) {
         return new RejectedImportParsingMessageHandler(importRepository, pluginCache);
+    }
+
+    @Bean
+    public TopicDefinition importsParsingFinishedTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-imports-parsing-finished-topic"))
+                .build();
     }
 
     @Bean
@@ -78,6 +103,14 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    public TopicDefinition scheduledImportsParsingFinishedTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-scheduled-imports-importing-topic"))
+                .build();
+    }
+
+    @Bean
     public MessageDestination scheduledImportsImportingMessageDestination() {
         var applicationName = getApplicationName();
         return MessageDestination.builder()
@@ -94,6 +127,14 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    public TopicDefinition completedImportsImportingTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-completed-imports-importing-topic"))
+                .build();
+    }
+
+    @Bean
     public MessageDestination completedImportImportingMessageDestination() {
         var applicationName = getApplicationName();
         return MessageDestination.builder()
@@ -106,6 +147,14 @@ public class KafkaConfiguration {
     public CompletedImportImportingMessageHandler completedImportImportingMessageHandler(final ImportRepository importRepository,
                                                                                          final PluginCache pluginCache) {
         return new CompletedImportImportingMessageHandler(importRepository, pluginCache);
+    }
+
+    @Bean
+    public TopicDefinition rejectedImportImportingTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-rejected-imports-importing-topic"))
+                .build();
     }
 
     @Bean

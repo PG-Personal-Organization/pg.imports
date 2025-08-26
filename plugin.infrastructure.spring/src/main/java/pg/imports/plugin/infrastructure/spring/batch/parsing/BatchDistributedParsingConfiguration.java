@@ -38,6 +38,7 @@ import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWrit
 import pg.imports.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListener;
 import pg.kafka.message.MessageDestination;
 import pg.kafka.sender.EventSender;
+import pg.kafka.topic.TopicDefinition;
 import pg.kafka.topic.TopicName;
 
 import java.util.List;
@@ -45,6 +46,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor(onConstructor_ = @__({@Autowired, @Lazy}))
 public class BatchDistributedParsingConfiguration {
+    private static final int DEFAULT_PARTITIONS = 16;
     private static final int PARSING_STEP_TRANSACTION_TIMEOUT = 3600;
 
     private final Environment environment;
@@ -60,8 +62,17 @@ public class BatchDistributedParsingConfiguration {
     private final ObjectMapper batchObjectMapper;
 
     @Bean
+    public TopicDefinition parsingChunkMessageRequestTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-chunk-request-processing-batch-topic"))
+                .partitions(DEFAULT_PARTITIONS)
+                .build();
+    }
+
+    @Bean
     public MessageDestination parsingChunkMessageRequestDestination() {
-        var applicationName = environment.getProperty("spring.application.name");
+        var applicationName = getApplicationName();
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-request-processing-batch-topic"))
                 .messageClass(ParseChunkMessageRequest.class)
@@ -69,8 +80,17 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
+    public TopicDefinition parsingChunkMessageResponseTopicDefinition() {
+        var applicationName = getApplicationName();
+        return TopicDefinition.DEFAULT
+                .topic(TopicName.of(applicationName + "-chunk-response-processing-batch-topic"))
+                .partitions(DEFAULT_PARTITIONS)
+                .build();
+    }
+
+    @Bean
     public MessageDestination parsingChunkMessageResponseDestination() {
-        var applicationName = environment.getProperty("spring.application.name");
+        var applicationName = getApplicationName();
         return MessageDestination.builder()
                 .topic(TopicName.of(applicationName + "-chunk-response-processing-batch-topic"))
                 .messageClass(ParseChunkMessageResponse.class)
@@ -153,5 +173,9 @@ public class BatchDistributedParsingConfiguration {
                 .next(distributedParsingStep(null, itemReader))
                 .next(finishParsingStep)
                 .build();
+    }
+
+    private String getApplicationName() {
+        return environment.getProperty("spring.application.name");
     }
 }
