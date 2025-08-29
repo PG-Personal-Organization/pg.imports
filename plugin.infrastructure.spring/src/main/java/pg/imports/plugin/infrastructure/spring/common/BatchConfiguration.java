@@ -18,7 +18,7 @@ import pg.context.auth.api.context.provider.ContextProvider;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.kafka.sender.EventSender;
-import pg.lib.awsfiles.infrastructure.config.AmazonConfig;
+import pg.lib.awsfiles.infrastructure.config.AmazonConfiguration;
 import pg.lib.awsfiles.service.api.FileService;
 import pg.imports.plugin.api.ImportPlugin;
 import pg.imports.plugin.api.service.ImportingHelper;
@@ -32,7 +32,7 @@ import java.util.List;
 @Import({
         ImportingConfiguration.class,
         ParsingConfiguration.class,
-        AmazonConfig.class
+        AmazonConfiguration.class
 })
 @Configuration
 @EnableBatchProcessing
