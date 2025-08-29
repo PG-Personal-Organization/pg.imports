@@ -14,8 +14,8 @@ import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
 import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
 import pg.imports.plugin.infrastructure.config.KafkaImportsMessageStrategy;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportEntity;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.states.OngoingImportingImport;
 

@@ -17,7 +17,7 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition.DistributedImportPartitionRequestSender;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition.ImportPartitionMessageResponse;
 import pg.imports.plugin.infrastructure.spring.batch.importing.listeners.ImportingErrorJobListener;

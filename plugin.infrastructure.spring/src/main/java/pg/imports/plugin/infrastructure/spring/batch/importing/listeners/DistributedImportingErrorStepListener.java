@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ public class DistributedImportingErrorStepListener extends SimpleImportingExecut
 //        if (stepExecution.getStatus().isUnsuccessful()) {
 //            log.info("Step execution {} unsuccessful", stepExecution.getStepName());
 //            var importContext = JobUtil.getImportContext(stepExecution);
-//            var recordChunks = recordsRepository.findAllByParentImportId(importContext.getImportId());
+//            var recordChunks = recordsRepository.findAllByParent_Id(importContext.getImportId());
 //            recordChunks.stream().map()
 //        }
         return stepExecution.getExitStatus();

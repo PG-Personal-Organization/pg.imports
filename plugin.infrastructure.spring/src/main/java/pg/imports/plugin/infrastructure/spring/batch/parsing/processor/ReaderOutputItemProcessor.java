@@ -23,9 +23,9 @@ public class ReaderOutputItemProcessor implements ItemProcessor<ReaderOutputItem
         var recordParser = plugin.getParsingComponentProvider().getRecordParser();
 
         try {
-            log.info("Processing item: {}", item);
+            log.debug("Processing item: {}", item);
             var parsedRecord = recordParser.parse(item, importContext);
-            log.info("Parsed item: {}", parsedRecord);
+            log.debug("Parsed item: {}", parsedRecord);
             return PartitionedRecord.of(parsedRecord, item.getPartitionId(), item.getChunkNumber());
         } catch (final Exception e) {
             log.error("Error during record parsing", e);

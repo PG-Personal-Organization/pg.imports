@@ -1,10 +1,10 @@
-package pg.imports.plugin.infrastructure.persistence.imports;
+package pg.imports.plugin.infrastructure.persistence.database.imports;
 
 import jakarta.persistence.*;
 import lombok.*;
 import pg.imports.plugin.api.data.ImportId;
 import pg.imports.plugin.api.data.PluginCode;
-import pg.imports.plugin.infrastructure.persistence.records.ImportRecordsEntity;
+import pg.imports.plugin.infrastructure.persistence.database.records.ImportRecordsEntity;
 import pg.imports.plugin.infrastructure.states.*;
 
 import java.time.LocalDateTime;

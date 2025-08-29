@@ -21,11 +21,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pg.imports.config.ImportsIntegrationTest;
 import pg.imports.plugin.api.data.ImportId;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportStatus;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsStatus;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportEntity;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportStatus;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsStatus;
 
 import java.io.InputStream;
 import java.time.Duration;
@@ -126,7 +126,7 @@ class TestPluginIntegrationTest {
                 throw new RuntimeException("Import with id " + importId.id() + " failed parsing.");
             }
 
-            var partitions = recordsRepository.findAllByParentImportId(importId.id());
+            var partitions = recordsRepository.findAllByParent_Id(importId.id());
             Assertions.assertEquals(expectedPartitionsCount, partitions.size());
             Assertions.assertTrue(partitions.stream().allMatch(importRecordsEntity -> importRecordsEntity.getRecordsStatus().equals(RecordsStatus.PARSED)));
             Assertions.assertEquals(expectedRecordsCount, partitions.stream().mapToLong(importRecordsEntity -> importRecordsEntity.getRecordIds().size()).sum());
@@ -163,7 +163,7 @@ class TestPluginIntegrationTest {
                 throw new RuntimeException("Import with id " + importId.id() + " failed importing.");
             }
 
-            partitions = recordsRepository.findAllByParentImportId(importId.id());
+            partitions = recordsRepository.findAllByParent_Id(importId.id());
             Assertions.assertTrue(partitions.stream().allMatch(importRecordsEntity -> importRecordsEntity.getRecordsStatus().equals(RecordsStatus.IMPORTED)));
 
             System.out.println("\n\nImport importing with id finished in: "

@@ -8,9 +8,9 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.transaction.annotation.Transactional;
 import pg.kafka.sender.EventSender;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportEntity;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.processing.events.CompletedImportEvent;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 

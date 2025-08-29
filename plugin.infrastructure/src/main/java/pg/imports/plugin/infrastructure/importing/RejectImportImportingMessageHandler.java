@@ -6,7 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import pg.imports.plugin.api.data.PluginCode;
 import pg.imports.plugin.api.importing.RecordsImportingErrorHandler;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.processing.ChunksHelper;
 import pg.imports.plugin.infrastructure.processing.events.RejectImportImportingEvent;

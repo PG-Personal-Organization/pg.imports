@@ -8,11 +8,11 @@ import pg.context.auth.api.context.provider.ContextProvider;
 import pg.imports.plugin.api.ImportPlugin;
 import pg.imports.plugin.api.data.*;
 import pg.imports.plugin.api.service.ImportingHelper;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportFactory;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
-import pg.imports.plugin.infrastructure.persistence.records.ImportRecordsEntity;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportEntity;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportFactory;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.ImportRecordsEntity;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.plugins.ImportPluginNotFoundException;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.processing.errors.ImportFileNotFoundException;
@@ -66,14 +66,14 @@ public class ImportingHelperService implements ImportingHelper {
     public ImportData findImportStatus(final @NonNull String importId, final @NonNull List<ImportStatus> statuses) {
         return importRepository.findByIdAndStatusIn(
                         importId,
-                        statuses.stream().map(ImportStatus::name).map(pg.imports.plugin.infrastructure.persistence.imports.ImportStatus::valueOf).toList())
+                        statuses.stream().map(ImportStatus::name).map(pg.imports.plugin.infrastructure.persistence.database.imports.ImportStatus::valueOf).toList())
                 .map(this::toImportData)
                 .orElse(null);
     }
 
     @Override
     public ImportRecordsData getImportRecords(final @NonNull String importId) {
-        var partitions = recordsRepository.findAllByParentImportId(importId);
+        var partitions = recordsRepository.findAllByParent_Id(importId);
         return ImportRecordsData.builder()
                 .partitions(partitions.stream().map(this::toImportRecordsPartition).toList())
                 .build();

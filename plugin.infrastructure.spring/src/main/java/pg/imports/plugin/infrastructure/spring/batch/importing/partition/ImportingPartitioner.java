@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import pg.imports.plugin.api.data.ImportId;
-import pg.imports.plugin.infrastructure.persistence.records.ImportRecordsEntity;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.ImportRecordsEntity;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class ImportingPartitioner implements Partitioner {
     @NonNull
     @Override
     public Map<String, ExecutionContext> partition(final int gridSize) {
-        var partitionIds = recordsRepository.findAllByParentImportId(importId.id()).stream().map(ImportRecordsEntity::getId).toList();
+        var partitionIds = recordsRepository.findAllByParent_Id(importId.id()).stream().map(ImportRecordsEntity::getId).toList();
         Map<String, ExecutionContext> map = HashMap.newHashMap(partitionIds.size());
         for (int i = 0; i < partitionIds.size(); i++) {
             var context = new ExecutionContext();

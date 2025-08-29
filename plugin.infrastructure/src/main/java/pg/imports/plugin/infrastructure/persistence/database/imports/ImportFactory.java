@@ -1,4 +1,4 @@
-package pg.imports.plugin.infrastructure.persistence.imports;
+package pg.imports.plugin.infrastructure.persistence.database.imports;
 
 import lombok.experimental.UtilityClass;
 import pg.imports.plugin.api.ImportPlugin;

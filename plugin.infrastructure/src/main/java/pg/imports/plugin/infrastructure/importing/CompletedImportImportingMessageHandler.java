@@ -6,7 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import pg.imports.plugin.api.importing.CompletedImportingCleaner;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.processing.ChunksHelper;
 import pg.imports.plugin.infrastructure.processing.events.CompletedImportEvent;
@@ -37,7 +37,7 @@ public class CompletedImportImportingMessageHandler implements MessageHandler<Co
         var errorRecordIds = completedImport.getRecords().stream().flatMap(r -> r.getErrorRecordIds().stream()).toList();
 
         clean(recordIds, errorRecordIds, completedImportingCleaner);
-        log.info("Import {} cleaning finished for imported records: {} and not imported: {}", completedImport.getImportId(), recordIds, errorRecordIds);
+        log.debug("Import {} cleaning finished for imported records: {} and not imported: {}", completedImport.getImportId(), recordIds, errorRecordIds);
     }
 
     private void clean(final List<String> recordIds, final List<String> errorRecordIds, final CompletedImportingCleaner completedImportingCleaner) {

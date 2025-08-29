@@ -6,7 +6,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import pg.kafka.sender.EventSender;
 import pg.imports.plugin.api.reason.ImportRejectionReasons;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.processing.events.RejectImportImportingEvent;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 
@@ -32,7 +32,7 @@ public class ImportingErrorJobListener implements JobExecutionListener {
             var reason = getRejectReason(jobExecution);
             var importContext = JobUtil.getImportContext(jobExecution);
             log.info("Import {} rejected with reason {}, description: {}", importContext.getImportId(), reason, jobExecution.getExitStatus().getExitDescription());
-            var recordsPartitions = recordsRepository.findAllByParentImportId(importContext.getImportId().id());
+            var recordsPartitions = recordsRepository.findAllByParent_Id(importContext.getImportId().id());
             var recordsIds = recordsPartitions.stream()
                     .map(importRecordsEntity -> Stream.concat(importRecordsEntity.getRecordIds().stream(), importRecordsEntity.getErrorRecordIds().stream()).toList())
                     .flatMap(Collection::stream)

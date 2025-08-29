@@ -18,7 +18,7 @@ import pg.imports.plugin.infrastructure.parsing.ImportParsingFinishedMessageHand
 import pg.imports.plugin.infrastructure.parsing.ParsingJobLauncher;
 import pg.imports.plugin.infrastructure.parsing.RejectedImportParsingMessageHandler;
 import pg.imports.plugin.infrastructure.parsing.ScheduledImportParsingMessageHandler;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.kafka.topic.TopicDefinition;
 import pg.kafka.topic.TopicName;

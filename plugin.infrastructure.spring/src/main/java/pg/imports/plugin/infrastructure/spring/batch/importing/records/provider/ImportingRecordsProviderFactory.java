@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import pg.imports.plugin.api.ImportPlugin;
 import pg.imports.plugin.api.importing.ImportingRecordsProvider;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
-import pg.imports.plugin.infrastructure.persistence.records.ImportRecordsEntity;
-import pg.imports.plugin.infrastructure.persistence.records.db.RecordRepository;
-import pg.imports.plugin.infrastructure.persistence.records.mongo.MongoRecordRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.ImportRecordsEntity;
+import pg.imports.plugin.infrastructure.persistence.database.records.db.RecordRepository;
+import pg.imports.plugin.infrastructure.persistence.mongo.MongoRecordRepository;
 
 import java.util.Collection;
 import java.util.List;

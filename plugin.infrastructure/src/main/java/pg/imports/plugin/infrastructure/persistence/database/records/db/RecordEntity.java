@@ -1,4 +1,4 @@
-package pg.imports.plugin.infrastructure.persistence.records.db;
+package pg.imports.plugin.infrastructure.persistence.database.records.db;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;

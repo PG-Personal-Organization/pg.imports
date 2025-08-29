@@ -5,8 +5,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.batch.importing.records.provider.ImportingRecordsProviderFactory;
@@ -33,7 +33,7 @@ public class SimpleImportingTasklet extends ImportingTasklet {
         importRepository.getImportingImport(importId.id());
         var plugin = pluginCache.getPlugin(importContext.getPluginCode());
 
-        var recordsPartitions = recordsRepository.findAllByParentImportId(importId.id());
+        var recordsPartitions = recordsRepository.findAllByParent_Id(importId.id());
         return execute(recordsPartitions, plugin, contribution);
     }
 

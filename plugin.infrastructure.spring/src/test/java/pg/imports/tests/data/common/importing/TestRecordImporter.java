@@ -2,7 +2,6 @@ package pg.imports.tests.data.common.importing;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import pg.imports.plugin.api.importing.ImportingRecordsProvider;
 import pg.imports.plugin.api.importing.ImportingResult;
 import pg.imports.plugin.api.importing.RecordImporter;
@@ -24,7 +23,7 @@ public class TestRecordImporter implements RecordImporter<TestRecord, ParsedReco
 
         var payments = records.stream().map(this::toImportedPayment).toList();
         paymentsRepository.saveAll(payments);
-        log.info("Imported payments {}", payments);
+        log.debug("Imported payments {}", payments);
         return ImportingResult.success();
     }
 

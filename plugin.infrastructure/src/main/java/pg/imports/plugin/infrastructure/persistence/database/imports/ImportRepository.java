@@ -1,15 +1,22 @@
-package pg.imports.plugin.infrastructure.persistence.imports;
+package pg.imports.plugin.infrastructure.persistence.database.imports;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import pg.imports.plugin.infrastructure.processing.errors.ImportNotExistsException;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ImportRepository extends JpaRepository<ImportEntity, String> {
-    Optional<ImportEntity> findByIdAndStatus(String id, ImportStatus status);
+    @Query("select i from imports i where i.id = :id and i.status = :status")
+    Optional<ImportEntity> findByIdAndStatus(@Param("id") String id,
+                                             @Param("status") ImportStatus status);
 
-    Optional<ImportEntity> findByIdAndStatusIn(String id, List<ImportStatus> statuses);
+    @Query("select i from imports i where i.id = :id and i.status in :statuses")
+    Optional<ImportEntity> findByIdAndStatusIn(@Param("id") String id,
+                                               @Param("statuses") List<ImportStatus> statuses);
+
 
     default ImportEntity getNewImport(final String id) {
         return findByIdAndStatus(id, ImportStatus.NEW)

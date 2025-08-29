@@ -1,4 +1,4 @@
-package pg.imports.plugin.infrastructure.persistence.imports;
+package pg.imports.plugin.infrastructure.persistence.database.imports;
 
 public enum ImportStatus {
     NEW,

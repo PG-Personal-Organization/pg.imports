@@ -11,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import pg.kafka.sender.EventSender;
 import pg.imports.plugin.api.data.ImportId;
 import pg.imports.plugin.api.reason.ImportRejectionReasons;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportEntity;
-import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
-import pg.imports.plugin.infrastructure.persistence.records.ImportRecordsEntity;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportEntity;
+import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.ImportRecordsEntity;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.processing.events.ImportParsingFinishedEvent;
 import pg.imports.plugin.infrastructure.processing.events.RejectImportParsingEvent;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
@@ -38,7 +38,7 @@ public class ParsingFinisherTasklet implements Tasklet {
         parsingImport.finishParsing();
         importRepository.save(parsingImport);
 
-        var recordsPartitions = recordsRepository.findAllByParentImportId(parsingImport.getImportId().id());
+        var recordsPartitions = recordsRepository.findAllByParent_Id(parsingImport.getImportId().id());
         if (recordsPartitions.isEmpty()) {
             log.info("No records found for import {}, rejecting import.", parsingImport.getImportId());
             eventSender.sendEvent(RejectImportParsingEvent.of(parsingImport.getImportId(), ImportRejectionReasons.NO_RECORDS_FOUND));

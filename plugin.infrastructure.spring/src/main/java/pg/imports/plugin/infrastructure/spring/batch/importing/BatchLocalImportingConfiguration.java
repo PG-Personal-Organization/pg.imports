@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import pg.kafka.sender.EventSender;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.spring.batch.importing.listeners.ImportingErrorJobListener;
 import pg.imports.plugin.infrastructure.spring.batch.importing.listeners.SimpleImportingExecutionErrorListener;
 import pg.imports.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListener;

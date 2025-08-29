@@ -10,8 +10,8 @@ import pg.imports.plugin.api.data.ImportContext;
 import pg.imports.plugin.api.data.ImportRecordStatus;
 import pg.imports.plugin.api.strategies.RecordsStoringStrategy;
 import pg.imports.plugin.api.writing.WrittenRecords;
-import pg.imports.plugin.infrastructure.persistence.records.db.RecordEntity;
-import pg.imports.plugin.infrastructure.persistence.records.db.RecordRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.db.RecordEntity;
+import pg.imports.plugin.infrastructure.persistence.database.records.db.RecordRepository;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.PartitionedRecord;
 
 import java.util.List;

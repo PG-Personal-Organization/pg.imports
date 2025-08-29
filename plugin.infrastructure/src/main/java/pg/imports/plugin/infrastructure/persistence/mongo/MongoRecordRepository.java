@@ -1,4 +1,4 @@
-package pg.imports.plugin.infrastructure.persistence.records.mongo;
+package pg.imports.plugin.infrastructure.persistence.mongo;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

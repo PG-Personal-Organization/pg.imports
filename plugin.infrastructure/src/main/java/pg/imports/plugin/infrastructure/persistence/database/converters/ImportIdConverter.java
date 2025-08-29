@@ -1,4 +1,4 @@
-package pg.imports.plugin.infrastructure.persistence.converters;
+package pg.imports.plugin.infrastructure.persistence.database.converters;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

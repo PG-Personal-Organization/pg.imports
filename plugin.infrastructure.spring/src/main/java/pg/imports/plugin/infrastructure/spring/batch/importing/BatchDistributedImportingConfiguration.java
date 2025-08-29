@@ -16,7 +16,7 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
-import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.config.DistributedImportingMasterConfiguration;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.config.DistributedImportingWorkerConfiguration;

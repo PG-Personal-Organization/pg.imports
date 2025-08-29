@@ -6,8 +6,8 @@ import lombok.SneakyThrows;
 import pg.imports.plugin.api.importing.ImportingRecordsProvider;
 import pg.imports.plugin.api.parsing.ReadOnlyParsedRecord;
 import pg.imports.plugin.api.strategies.db.RecordData;
-import pg.imports.plugin.infrastructure.persistence.records.db.RecordEntity;
-import pg.imports.plugin.infrastructure.persistence.records.db.RecordRepository;
+import pg.imports.plugin.infrastructure.persistence.database.records.db.RecordEntity;
+import pg.imports.plugin.infrastructure.persistence.database.records.db.RecordRepository;
 
 import java.util.Arrays;
 import java.util.List;
