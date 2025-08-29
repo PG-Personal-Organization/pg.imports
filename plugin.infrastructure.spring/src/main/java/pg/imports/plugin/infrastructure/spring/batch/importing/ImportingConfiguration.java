@@ -26,7 +26,11 @@ import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.Importin
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.ImportingInitializerTasklet;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.PartitionedImportingTasklet;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.SimpleImportingTasklet;
+import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.writer.ImportingErrorsWriterManager;
+import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWriter;
 import pg.kafka.sender.EventSender;
+
+import java.util.List;
 
 @Import({
         BatchLocalImportingConfiguration.class,
@@ -68,13 +72,15 @@ public class ImportingConfiguration {
     }
 
     @Bean
-    public Tasklet simpleImportingTasklet(final ImportingRecordsProviderFactory importingRecordsProviderFactory) {
-        return new SimpleImportingTasklet(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory);
+    public Tasklet simpleImportingTasklet(final ImportingRecordsProviderFactory importingRecordsProviderFactory,
+                                          final ImportingErrorsWriterManager importingErrorsWriterManager) {
+        return new SimpleImportingTasklet(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory, importingErrorsWriterManager);
     }
 
     @Bean
-    public Tasklet partitionedImportingTasklet(final ImportingRecordsProviderFactory importingRecordsProviderFactory) {
-        return new PartitionedImportingTasklet(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory);
+    public Tasklet partitionedImportingTasklet(final ImportingRecordsProviderFactory importingRecordsProviderFactory,
+                                               final ImportingErrorsWriterManager importingErrorsWriterManager) {
+        return new PartitionedImportingTasklet(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory, importingErrorsWriterManager);
     }
 
     @Bean
@@ -106,6 +112,11 @@ public class ImportingConfiguration {
     public ImportingRecordsProviderFactory importingRecordsProviderFactory(final RecordRepository recordRepository, final MongoRecordRepository mongoRecordRepository,
                                                                            final ObjectMapper batchObjectMapper) {
         return new ImportingRecordsProviderFactory(recordRepository, mongoRecordRepository, batchObjectMapper);
+    }
+
+    @Bean
+    public ImportingErrorsWriterManager importingErrorsWriterManager(final List<RecordsWriter> recordsWriters) {
+        return new ImportingErrorsWriterManager(recordsWriters);
     }
 
 }

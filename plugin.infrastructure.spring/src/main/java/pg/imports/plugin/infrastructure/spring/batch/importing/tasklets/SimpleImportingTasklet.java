@@ -10,6 +10,7 @@ import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.batch.importing.records.provider.ImportingRecordsProviderFactory;
+import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.writer.ImportingErrorsWriterManager;
 
 @Log4j2
 public class SimpleImportingTasklet extends ImportingTasklet {
@@ -17,8 +18,9 @@ public class SimpleImportingTasklet extends ImportingTasklet {
     public SimpleImportingTasklet(final ImportRepository importRepository,
                                   final PluginCache pluginCache,
                                   final RecordsRepository recordsRepository,
-                                  final ImportingRecordsProviderFactory importingRecordsProviderFactory) {
-        super(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory);
+                                  final ImportingRecordsProviderFactory importingRecordsProviderFactory,
+                                  final ImportingErrorsWriterManager importingErrorsWriterManager) {
+        super(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory, importingErrorsWriterManager);
     }
 
     @Override

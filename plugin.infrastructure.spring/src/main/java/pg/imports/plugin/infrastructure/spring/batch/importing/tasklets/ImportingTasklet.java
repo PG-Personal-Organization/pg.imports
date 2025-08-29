@@ -13,9 +13,14 @@ import pg.imports.plugin.infrastructure.persistence.records.RecordsStatus;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.batch.importing.records.provider.ImportingRecordsProviderFactory;
+import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.writer.ImportingErrorsWriterManager;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -24,6 +29,7 @@ public abstract class ImportingTasklet implements Tasklet {
     protected final PluginCache pluginCache;
     protected final RecordsRepository recordsRepository;
     private final ImportingRecordsProviderFactory importingRecordsProviderFactory;
+    private final ImportingErrorsWriterManager importingErrorsWriterManager;
 
     protected RepeatStatus execute(final List<ImportRecordsEntity> recordsPartitions, final ImportPlugin plugin, final StepContribution contribution) {
         var storingStrategy = recordsPartitions.stream().map(ImportRecordsEntity::getStrategy).findFirst().orElseThrow();
@@ -37,7 +43,19 @@ public abstract class ImportingTasklet implements Tasklet {
         if (importingResult.getImportingErrorCode().isPresent()) {
             JobUtil.putRejectReason(contribution.getStepExecution(), importingResult.getImportingErrorCode().get());
             log.info("ImportingTasklet finished with error: {}", importingResult.getImportingErrorCode().get());
-            recordsPartitions.forEach(importRecordsEntity -> importRecordsEntity.setRecordsStatus(RecordsStatus.FAILED));
+
+            recordsPartitions.forEach(records -> records.setRecordsStatus(RecordsStatus.FAILED));
+            importingResult.getErrorMessages().ifPresentOrElse(
+                    errorMessages -> {
+                        importingErrorsWriterManager.writeErrors(storingStrategy, errorMessages, plugin);
+                        recordsPartitions.forEach(records -> applyErrors(records, errorMessages::get));
+                    },
+                    () -> {
+                        var defaultErrorCode = importingResult.getImportingErrorCode().get();
+                        recordsPartitions.forEach(records -> applyErrors(records, id -> defaultErrorCode));
+                    }
+            );
+
             recordsRepository.saveAll(recordsPartitions);
             return RepeatStatus.FINISHED;
         }
@@ -51,6 +69,14 @@ public abstract class ImportingTasklet implements Tasklet {
         var timestamp = LocalDateTime.now();
         recordsPartitions.forEach(importRecordsEntity -> importRecordsEntity.setStartedImportingOn(timestamp));
         recordsRepository.saveAll(recordsPartitions);
+    }
+
+    private void applyErrors(final ImportRecordsEntity recordsEntity, final UnaryOperator<String> errorMessageProvider) {
+        var recordIds = recordsEntity.getRecordIds();
+        recordsEntity.setRecordIds(Collections.emptySet());
+        recordsEntity.getErrorRecordIds().addAll(recordIds);
+        recordsEntity.setErrorCount(recordsEntity.getErrorRecordIds().size());
+        recordsEntity.getErrorMessages().putAll(recordIds.stream().collect(Collectors.toMap(Function.identity(), errorMessageProvider)));
     }
 
     private void updateImportingFinished(final List<ImportRecordsEntity> recordsPartitions) {

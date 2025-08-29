@@ -11,6 +11,7 @@ import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.spring.batch.importing.partition.ImportingPartitioner;
 import pg.imports.plugin.infrastructure.spring.batch.importing.records.provider.ImportingRecordsProviderFactory;
+import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.writer.ImportingErrorsWriterManager;
 
 import java.util.Collections;
 
@@ -20,8 +21,9 @@ public class PartitionedImportingTasklet extends ImportingTasklet {
     public PartitionedImportingTasklet(final ImportRepository importRepository,
                                        final PluginCache pluginCache,
                                        final RecordsRepository recordsRepository,
-                                       final ImportingRecordsProviderFactory importingRecordsProviderFactory) {
-        super(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory);
+                                       final ImportingRecordsProviderFactory importingRecordsProviderFactory,
+                                       final ImportingErrorsWriterManager importingErrorsWriterManager) {
+        super(importRepository, pluginCache, recordsRepository, importingRecordsProviderFactory, importingErrorsWriterManager);
     }
 
     @Override

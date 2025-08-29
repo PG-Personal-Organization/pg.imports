@@ -73,6 +73,16 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
         return new WrittenRecords(getRecordIdsByStatus(recordsByStatus, SUCCESS_STATUSES), getRecordIdsByStatus(recordsByStatus, ERROR_STATUSES), errorMessages);
     }
 
+    @Override
+    public void writeImportingRecordErrors(final Map<String, String> recordsErrorMessages, final ImportPlugin plugin) {
+        var records = recordRepository.findAllById(recordsErrorMessages.keySet());
+        if (records.size() != recordsErrorMessages.size()) {
+            throw new IllegalStateException("Some records were not found in database storage");
+        }
+        records.forEach(record -> record.setErrorMessages(record.getErrorMessages().concat("\n" + recordsErrorMessages.get(record.getId()))));
+        recordRepository.saveAll(records);
+    }
+
     private List<String> getRecordIdsByStatus(final Map<ImportRecordStatus, List<RecordDocument>> records, final Set<ImportRecordStatus> statuses) {
         return records.entrySet().stream()
                 .filter(entry -> statuses.contains(entry.getKey()))
