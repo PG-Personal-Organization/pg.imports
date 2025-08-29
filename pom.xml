@@ -12,7 +12,7 @@
 
     <artifactId>imports</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.0</version>
+    <version>2.3.0</version>
 
     <name>pg.imports</name>
     <description>pg.imports</description>
@@ -22,7 +22,7 @@
 
         <pg-lib-common.version>2.1.0</pg-lib-common.version>
         <pg-kafka.version>2.1.0</pg-kafka.version>
-        <pg-context.auth.version>3.1.0</pg-context.auth.version>
+        <pg-context.auth.version>3.2.0</pg-context.auth.version>
         <hibernate-core.version>6.5.3.Final</hibernate-core.version>
         <hibernate-utils.version>3.9.0</hibernate-utils.version>
         <beanio.version>2.1.0</beanio.version>
