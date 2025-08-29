@@ -45,7 +45,7 @@ public class ImportEntity implements NewImport, OngoingParsingImport, ParsingCom
     private String pluginCode;
 
     @Column
-    private UUID userId;
+    private String userId;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, orphanRemoval = true)
     @ToString.Exclude

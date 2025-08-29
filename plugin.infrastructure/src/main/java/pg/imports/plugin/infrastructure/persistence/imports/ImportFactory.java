@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @UtilityClass
 public class ImportFactory {
-    public ImportEntity createScheduledImport(final ImportPlugin importPlugin, final UUID fileId, final UUID userId) {
+    public ImportEntity createScheduledImport(final ImportPlugin importPlugin, final UUID fileId, final String userId) {
         return ImportEntity.builder()
                 .id(generateId(importPlugin.getCodeIdPrefix(), importPlugin.getVersion()))
                 .createdOn(LocalDateTime.now())

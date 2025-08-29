@@ -14,7 +14,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import pg.context.auth.api.context.provider.ContextProvider;
 import pg.imports.plugin.infrastructure.persistence.imports.ImportRepository;
+import pg.imports.plugin.infrastructure.persistence.records.RecordsRepository;
 import pg.kafka.sender.EventSender;
 import pg.lib.awsfiles.infrastructure.config.AmazonConfig;
 import pg.lib.awsfiles.service.api.FileService;
@@ -43,8 +45,13 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public ImportingHelper importingHelper(final PluginCache pluginCache, final ImportRepository importRepository, final FileService fileService, final EventSender eventSender) {
-        return new ImportingHelperService(pluginCache, importRepository, fileService, eventSender);
+    public ImportingHelper importingHelper(final ContextProvider contextProvider,
+                                           final PluginCache pluginCache,
+                                           final ImportRepository importRepository,
+                                           final RecordsRepository recordsRepository,
+                                           final FileService fileService,
+                                           final EventSender eventSender) {
+        return new ImportingHelperService(contextProvider, pluginCache, importRepository, recordsRepository, fileService, eventSender);
     }
 
     @Bean(name = "batchObjectMapper")

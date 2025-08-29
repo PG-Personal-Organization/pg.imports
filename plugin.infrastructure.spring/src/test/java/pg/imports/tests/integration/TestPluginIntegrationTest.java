@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static org.awaitility.Awaitility.await;
+import static pg.lib.common.spring.auth.HeaderNames.CONTEXT_TOKEN;
 
 @ImportsIntegrationTest
 @EmbeddedKafka(brokerProperties = {"transaction.max.timeout.ms=3600000"})
@@ -86,6 +87,7 @@ class TestPluginIntegrationTest {
         try (InputStream fileInputStream = this.getClass().getClassLoader().getResourceAsStream(file)) {
             var fileId = RestAssured
                     .given()
+                    .header(CONTEXT_TOKEN, "MOCK_CONTEXT_TOKEN")
                     .multiPart("file", fileName, fileInputStream)
 
                     .when()
@@ -98,6 +100,7 @@ class TestPluginIntegrationTest {
             // when
             var importId = RestAssured
                     .given()
+                    .header(CONTEXT_TOKEN, "MOCK_CONTEXT_TOKEN")
 
                     .when()
                     .post("/api/v1/imports/start/{fileId}/{pluginCode}", fileId, pluginCode)
@@ -138,6 +141,7 @@ class TestPluginIntegrationTest {
             // when
             RestAssured
                     .given()
+                    .header(CONTEXT_TOKEN, "MOCK_CONTEXT_TOKEN")
 
                     .when()
                     .post("/api/v1/imports/confirm/{importId}", importId.id())
