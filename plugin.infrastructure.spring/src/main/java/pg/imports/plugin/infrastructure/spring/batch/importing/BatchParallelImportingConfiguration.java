@@ -14,12 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
+import pg.imports.plugin.infrastructure.spring.batch.common.parallel.ParallelTaskDecorator;
 import pg.imports.plugin.infrastructure.spring.batch.importing.partition.ImportingPartitioner;
 import pg.imports.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListener;
+import pg.lib.common.spring.storage.HeadersHolder;
 
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -38,8 +41,6 @@ public class BatchParallelImportingConfiguration {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
 
-    private final ImportingPartitioner importingPartitioner;
-
     private final Tasklet partitionedImportingTasklet;
     private final TaskletStep initImportingStep;
     private final TaskletStep finishImportingStep;
@@ -57,39 +58,40 @@ public class BatchParallelImportingConfiguration {
 
     @Bean
     @StepScope
-    public TaskExecutorPartitionHandler parallelPartitionHandler() {
+    public TaskExecutorPartitionHandler parallelPartitionHandler(final @Lazy TaskExecutor parallelImportTaskExecutor) {
         TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
         handler.setStep(parallelImportingWorkerStep());
         handler.setGridSize(corePoolSize);
-        handler.setTaskExecutor(parallelImportTaskExecutor());
+        handler.setTaskExecutor(parallelImportTaskExecutor);
         return handler;
     }
 
     @Bean
-    public Step parallelImportingStep() {
+    public Step parallelImportingStep(final @Lazy ImportingPartitioner importingPartitioner, final @Lazy TaskExecutorPartitionHandler parallelPartitionHandler) {
         return new StepBuilder(PARTITIONED_STEP_NAME, jobRepository)
                 .partitioner(WORKER_STEP_NAME, importingPartitioner)
-                .partitionHandler(parallelPartitionHandler())
+                .partitionHandler(parallelPartitionHandler)
                 .build();
     }
 
     @Bean
-    public Job localParallelImportingJob() {
+    public Job localParallelImportingJob(final @Lazy Step parallelImportingStep) {
         return new JobBuilder("localParallelImportingJob", jobRepository)
                 .listener(new LoggingJobExecutionListener())
                 .start(initImportingStep)
-                .next(parallelImportingStep())
+                .next(parallelImportingStep)
                 .next(finishImportingStep)
                 .build();
     }
 
     @Bean
-    public TaskExecutor parallelImportTaskExecutor() {
+    public TaskExecutor parallelImportTaskExecutor(final HeadersHolder headersHolder) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(corePoolSize);
         executor.setMaxPoolSize(maxPoolSize);
         executor.setQueueCapacity(Math.max(maxPoolSize * 2, QUEUE_LIMIT));
         executor.setThreadNamePrefix("parallel-imports-importer-");
+        executor.setTaskDecorator(new ParallelTaskDecorator(headersHolder));
         executor.initialize();
         return executor;
     }

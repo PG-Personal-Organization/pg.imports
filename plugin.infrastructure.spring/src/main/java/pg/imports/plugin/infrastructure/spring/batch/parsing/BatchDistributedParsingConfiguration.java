@@ -108,6 +108,7 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
+    @Lazy(false)
     public IntegrationFlow parsingOutboundFlow(final DistributedParseChunkSender distributedParseChunkSender) {
         return IntegrationFlow
                 .from(parsingRequests())
@@ -116,7 +117,8 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
-    public DistributedParseChunkSender distributedChunkSender() {
+    @Lazy(false)
+    public DistributedParseChunkSender distributedParseChunkSender() {
         return new DistributedParseChunkSender(eventSender, batchObjectMapper);
     }
 
@@ -165,12 +167,12 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
-    public Job distributedParsingJob(final ItemReader<ReaderOutputItem<Object>> itemReader) {
+    public Job distributedParsingJob(final @Lazy TaskletStep distributedParsingStep) {
         return new JobBuilder("distributedParsingJob", jobRepository)
                 .listener(new LoggingJobExecutionListener())
                 .listener(new ParsingErrorJobListener(eventSender, recordsRepository))
                 .start(initParsingStep)
-                .next(distributedParsingStep(null, itemReader))
+                .next(distributedParsingStep)
                 .next(finishParsingStep)
                 .build();
     }

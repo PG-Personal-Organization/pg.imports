@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.web.bind.annotation.*;
-import pg.imports.plugin.api.data.ImportId;
-import pg.imports.plugin.api.data.ImportData;
-import pg.imports.plugin.api.data.ImportRecordsData;
-import pg.imports.plugin.api.data.ImportStatus;
+import pg.imports.plugin.api.data.*;
 import pg.imports.plugin.api.service.ImportingHelper;
 
 import java.util.List;
@@ -31,8 +28,8 @@ public class ImportController {
     }
 
     @GetMapping(value = "/status/{importId}/{statuses}")
-    public ImportData getImportStatus(final @NonNull @PathVariable("importId") String importId, final @NonNull @PathVariable("statuses") List<ImportStatus> statuses) {
-        return importingHelper.findImportStatus(importId, statuses);
+    public ImportDataResponse getImportStatus(final @NonNull @PathVariable("importId") String importId, final @NonNull @PathVariable("statuses") List<ImportStatus> statuses) {
+        return ImportDataResponse.builder().data(importingHelper.findImportStatus(importId, statuses)).build();
     }
 
     @GetMapping(value = "/records/{importId}")

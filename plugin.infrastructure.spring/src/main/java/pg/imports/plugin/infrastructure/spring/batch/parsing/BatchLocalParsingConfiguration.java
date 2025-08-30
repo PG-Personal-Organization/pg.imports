@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -89,12 +90,12 @@ public class BatchLocalParsingConfiguration {
     }
 
     @Bean
-    public Job localParsingJob() {
+    public Job localParsingJob(final @Lazy TaskletStep simpleParsingStep) {
         return new JobBuilder("localParsingJob", jobRepository)
                 .listener(new LoggingJobExecutionListener())
                 .listener(new ParsingErrorJobListener(eventSender, recordsRepository))
                 .start(initParsingStep)
-                .next(simpleParsingStep(null))
+                .next(simpleParsingStep)
                 .next(finishParsingStep)
                 .build();
     }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -57,6 +58,7 @@ public class DistributedImportingWorkerConfiguration {
     }
 
     @Bean
+    @Lazy(false)
     public IntegrationFlow inboundRequestsFlow(final StepExecutionRequestHandler stepExecutionRequestHandler) {
         return IntegrationFlow
                 .from(partitionRequestInbound)

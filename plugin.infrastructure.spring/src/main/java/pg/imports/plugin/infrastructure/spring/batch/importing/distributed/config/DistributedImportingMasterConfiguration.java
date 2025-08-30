@@ -13,6 +13,7 @@ import org.springframework.batch.integration.partition.MessageChannelPartitionHa
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageChannel;
@@ -42,7 +43,6 @@ public class DistributedImportingMasterConfiguration {
     private final MessageChannel partitionReplyInbound;
 
     private final DistributedImportPartitionRequestSender distributedImportPartitionRequestSender;
-    private final ImportingPartitioner importingPartitioner;
 
     private final TaskletStep initImportingStep;
     private final TaskletStep finishImportingStep;
@@ -64,26 +64,27 @@ public class DistributedImportingMasterConfiguration {
     }
 
     @Bean
-    public Step distributedImportingStep() {
+    public Step distributedImportingStep(final @Lazy ImportingPartitioner importingPartitioner, final @Lazy MessageChannelPartitionHandler distributedPartitionHandler) {
         return new StepBuilder(MANAGER_STEP, jobRepository)
                 .partitioner(WORKER_STEP, importingPartitioner)
-                .partitionHandler(distributedPartitionHandler())
+                .partitionHandler(distributedPartitionHandler)
                 .build();
     }
 
     @Bean
-    public Job distributedImportingJob() {
+    public Job distributedImportingJob(final @Lazy Step distributedImportingStep) {
         return new JobBuilder("distributedImportingJob", jobRepository)
                 .listener(new LoggingJobExecutionListener())
                 .listener(new ImportingErrorJobListener(eventSender, recordsRepository))
                 .start(initImportingStep)
-                .next(distributedImportingStep())
+                .next(distributedImportingStep)
                 .next(finishImportingStep)
                 .build();
     }
 
     @Bean
-    public IntegrationFlow outboundRequests() {
+    @Lazy(false)
+    public IntegrationFlow importingOutboundRequestsFlow() {
         return IntegrationFlow
                 .from(importingRequests)
                 .handle(distributedImportPartitionRequestSender)
@@ -91,6 +92,7 @@ public class DistributedImportingMasterConfiguration {
     }
 
     @Bean
+    @Lazy(false)
     public IntegrationFlow inboundPartitionReplies() {
         return IntegrationFlow
                 .from(partitionReplyInbound)

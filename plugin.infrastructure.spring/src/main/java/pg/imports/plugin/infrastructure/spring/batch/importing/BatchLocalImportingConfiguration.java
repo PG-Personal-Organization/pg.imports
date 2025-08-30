@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import pg.kafka.sender.EventSender;
@@ -37,12 +38,12 @@ public class BatchLocalImportingConfiguration {
     private final EventSender eventSender;
 
     @Bean
-    public Job localImportingJob() {
+    public Job localImportingJob(final @Lazy TaskletStep simpleImportingStep) {
         return new JobBuilder("localImportingJob", jobRepository)
                 .listener(new LoggingJobExecutionListener())
                 .listener(new ImportingErrorJobListener(eventSender, recordsRepository))
                 .start(initImportingStep)
-                .next(simpleImportingStep(null))
+                .next(simpleImportingStep)
                 .next(finishImportingStep)
                 .build();
     }

@@ -19,17 +19,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
-import pg.kafka.sender.EventSender;
 import pg.imports.plugin.api.parsing.ReaderOutputItem;
 import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
+import pg.imports.plugin.infrastructure.spring.batch.common.parallel.ParallelTaskDecorator;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.listeners.ParsingErrorJobListener;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.listeners.SimpleParsingExecutionErrorListener;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.PartitionedRecord;
@@ -37,6 +38,8 @@ import pg.imports.plugin.infrastructure.spring.batch.parsing.processor.ReaderOut
 import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWriter;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.writing.RecordsWriterManager;
 import pg.imports.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListener;
+import pg.kafka.sender.EventSender;
+import pg.lib.common.spring.storage.HeadersHolder;
 
 import java.util.List;
 import java.util.concurrent.Future;
@@ -65,19 +68,21 @@ public class BatchParallelParsingConfiguration {
     private int maxPoolSize;
 
     @Bean
-    public TaskExecutor parallelParsingTaskExecutor() {
+    public TaskExecutor parallelParsingTaskExecutor(final HeadersHolder headersHolder) {
         ThreadPoolTaskExecutor t = new ThreadPoolTaskExecutor();
         t.setCorePoolSize(corePoolSize);
         t.setMaxPoolSize(maxPoolSize);
         t.setQueueCapacity(Math.max(maxPoolSize * 2, QUEUE_LIMIT));
         t.setThreadNamePrefix("parallel-imports-parser-");
+        t.setTaskDecorator(new ParallelTaskDecorator(headersHolder));
         t.initialize();
         return t;
     }
 
     @JobScope
     @Bean
-    public TaskletStep parallelParsingStep(final @Value("#{jobExecution}") JobExecution jobExecution) {
+    public TaskletStep parallelParsingStep(final @Value("#{jobExecution}") JobExecution jobExecution,
+                                           final @Lazy AsyncItemProcessor<ReaderOutputItem<Object>, PartitionedRecord> asyncParallelItemProcessor) {
         var transactionAttribute = new DefaultTransactionAttribute();
         transactionAttribute.setTimeout(PARSING_STEP_TRANSACTION_TIMEOUT);
 
@@ -88,7 +93,7 @@ public class BatchParallelParsingConfiguration {
         return new StepBuilder("parallelParsingStep", jobRepository)
                 .<ReaderOutputItem<Object>, Future<PartitionedRecord>>chunk(chunkSize, chainedTransactionManager)
                 .reader(itemReader)
-                .processor(asyncParallelItemProcessor())
+                .processor(asyncParallelItemProcessor)
                 .writer(asyncParallelItemWriter())
                 .transactionAttribute(transactionAttribute)
                 .faultTolerant()
@@ -118,20 +123,20 @@ public class BatchParallelParsingConfiguration {
     }
 
     @Bean
-    public AsyncItemProcessor<ReaderOutputItem<Object>, PartitionedRecord> asyncParallelItemProcessor() {
+    public AsyncItemProcessor<ReaderOutputItem<Object>, PartitionedRecord> asyncParallelItemProcessor(final TaskExecutor parallelParsingTaskExecutor) {
         var p = new AsyncItemProcessor<ReaderOutputItem<Object>, PartitionedRecord>();
         p.setDelegate(parallelItemProcessor(null));
-        p.setTaskExecutor(parallelParsingTaskExecutor());
+        p.setTaskExecutor(parallelParsingTaskExecutor);
         return p;
     }
 
     @Bean
-    public Job localParallelParsingJob() {
+    public Job localParallelParsingJob(final @Lazy TaskletStep parallelParsingStep) {
         return new JobBuilder("localParallelParsingJob", jobRepository)
                 .listener(new LoggingJobExecutionListener())
                 .listener(new ParsingErrorJobListener(eventSender, recordsRepository))
                 .start(initParsingStep)
-                .next(parallelParsingStep(null))
+                .next(parallelParsingStep)
                 .next(finishParsingStep)
                 .build();
     }
