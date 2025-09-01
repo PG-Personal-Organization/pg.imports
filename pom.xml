@@ -12,7 +12,7 @@
 
     <artifactId>imports</artifactId>
     <packaging>pom</packaging>
-    <version>2.5.2</version>
+    <version>2.5.3</version>
 
     <name>pg.imports</name>
     <description>pg.imports</description>
@@ -20,7 +20,7 @@
     <properties>
         <project.version>${project.version}</project.version>
 
-        <pg-lib-common.version>2.3.1</pg-lib-common.version>
+        <pg-lib-common.version>2.3.2</pg-lib-common.version>
         <pg-kafka.version>2.2.0</pg-kafka.version>
         <pg-context.auth.version>3.3.1</pg-context.auth.version>
         <hibernate-core.version>6.5.3.Final</hibernate-core.version>
