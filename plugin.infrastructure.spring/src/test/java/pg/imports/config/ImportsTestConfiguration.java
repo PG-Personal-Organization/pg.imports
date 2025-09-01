@@ -21,7 +21,7 @@ import pg.imports.tests.data.common.importing.TestImportingComponentsProvider;
 import pg.imports.tests.data.common.importing.TestRecordImporter;
 import pg.imports.tests.data.common.parsing.TestParsingComponentsProvider;
 import pg.imports.tests.data.common.parsing.TestRecordParser;
-import pg.lib.awsfiles.infrastructure.config.InMemoryMockConfiguration;
+import pg.lib.awsfiles.infrastructure.mock.InMemoryMockConfiguration;
 import pg.lib.common.spring.auth.HeaderAuthenticationFilter;
 import pg.lib.common.spring.config.CommonModuleConfiguration;
 import pg.lib.common.spring.storage.HeadersHolder;

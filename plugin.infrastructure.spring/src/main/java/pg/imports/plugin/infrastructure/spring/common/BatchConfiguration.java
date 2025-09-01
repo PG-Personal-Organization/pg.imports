@@ -19,7 +19,7 @@ import pg.context.auth.api.context.provider.ContextProvider;
 import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.kafka.sender.EventSender;
-import pg.lib.awsfiles.infrastructure.config.AmazonConfiguration;
+import pg.lib.awsfiles.infrastructure.s3.config.AmazonConfiguration;
 import pg.lib.awsfiles.service.api.FileService;
 import pg.imports.plugin.api.ImportPlugin;
 import pg.imports.plugin.api.service.ImportingHelper;
