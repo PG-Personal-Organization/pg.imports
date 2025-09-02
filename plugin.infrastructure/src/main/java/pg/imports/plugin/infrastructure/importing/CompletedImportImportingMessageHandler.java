@@ -41,6 +41,11 @@ public class CompletedImportImportingMessageHandler implements MessageHandler<Co
     }
 
     private void clean(final List<String> recordIds, final List<String> errorRecordIds, final CompletedImportingCleaner completedImportingCleaner) {
+        if (recordIds.isEmpty() && errorRecordIds.isEmpty()) {
+            log.debug("No records to clean.");
+            return;
+        }
+
         final int chunkSize = Math.max(1, cleaningPartsSize);
         ChunksHelper.forEachChunk(recordIds, chunkSize, completedImportingCleaner::handleCleaningSuccessfulRecords);
         ChunksHelper.forEachChunk(errorRecordIds, chunkSize, completedImportingCleaner::handleCleaningFailedRecords);

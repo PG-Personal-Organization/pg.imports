@@ -45,6 +45,11 @@ public class RejectImportImportingMessageHandler implements MessageHandler<Rejec
     }
 
     private void clean(final List<String> recordIds, final RecordsImportingErrorHandler errorHandler) {
+        if (recordIds.isEmpty()) {
+            log.debug("No error recordIds to clean.");
+            return;
+        }
+
         final int chunkSize = Math.max(1, cleaningPartsSize);
         ChunksHelper.forEachChunk(recordIds, chunkSize, errorHandler::handleImportingError);
     }
