@@ -57,6 +57,7 @@ public abstract class ImportingTasklet implements Tasklet {
             recordsPartitions.forEach(records -> records.setRecordsStatus(RecordsStatus.FAILED));
             importingResult.getErrorMessages().ifPresentOrElse(
                     errorMessages -> {
+                        log.debug("Writing errors {} to database", errorMessages);
                         importingErrorsWriterManager.writeErrors(storingStrategy, errorMessages, plugin);
                         recordsPartitions.forEach(records -> applyErrors(records, errorMessages::get));
                     },
