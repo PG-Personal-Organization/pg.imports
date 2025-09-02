@@ -24,7 +24,6 @@ public class SimpleImportingTasklet extends ImportingTasklet {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public RepeatStatus execute(final @NonNull StepContribution contribution, final @NonNull ChunkContext chunkContext) {
         log.info("SimpleImportingTasklet started");
         var importContext = JobUtil.getImportContext(contribution.getStepExecution());

@@ -7,6 +7,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
 import pg.imports.plugin.api.data.ImportContext;
 import pg.imports.plugin.api.parsing.ReaderOutputItem;
+import pg.imports.plugin.api.reason.ImportRejectionReasons;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 
@@ -26,6 +27,11 @@ public class ReaderOutputItemProcessor implements ItemProcessor<ReaderOutputItem
             log.debug("Processing item: {}", item);
             var parsedRecord = recordParser.parse(item, importContext);
             log.debug("Parsed item: {}", parsedRecord);
+
+            if (!parsedRecord.getErrorMessages().isEmpty()) {
+                log.error("Record parsing failed: {}", parsedRecord);
+                JobUtil.putRejectReason(stepExecution, ImportRejectionReasons.FAILED_RECORDS_PARSING);
+            }
             return PartitionedRecord.of(parsedRecord, item.getPartitionId(), item.getChunkNumber());
         } catch (final Exception e) {
             log.error("Error during record parsing", e);

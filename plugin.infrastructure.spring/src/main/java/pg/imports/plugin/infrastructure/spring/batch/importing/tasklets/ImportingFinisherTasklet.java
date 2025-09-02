@@ -1,5 +1,6 @@
 package pg.imports.plugin.infrastructure.spring.batch.importing.tasklets;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.StepContribution;
@@ -23,7 +24,7 @@ public class ImportingFinisherTasklet implements Tasklet {
 
     @Override
     @Transactional
-    public RepeatStatus execute(final StepContribution contribution, final ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(final @NonNull StepContribution contribution, final @NonNull ChunkContext chunkContext) {
         var importContext = JobUtil.getImportContext(contribution.getStepExecution());
         var importId = importContext.getImportId();
 

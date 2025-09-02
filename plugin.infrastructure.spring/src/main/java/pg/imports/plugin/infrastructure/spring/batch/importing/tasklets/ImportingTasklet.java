@@ -6,6 +6,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import pg.imports.plugin.api.ImportPlugin;
+import pg.imports.plugin.api.importing.ImportingResult;
 import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.persistence.database.records.ImportRecordsEntity;
 import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
@@ -31,6 +32,7 @@ public abstract class ImportingTasklet implements Tasklet {
     private final ImportingRecordsProviderFactory importingRecordsProviderFactory;
     private final ImportingErrorsWriterManager importingErrorsWriterManager;
 
+    @SuppressWarnings("unchecked")
     protected RepeatStatus execute(final List<ImportRecordsEntity> recordsPartitions, final ImportPlugin plugin, final StepContribution contribution) {
         var storingStrategy = recordsPartitions.stream().map(ImportRecordsEntity::getStrategy).findFirst().orElseThrow();
 
@@ -38,11 +40,19 @@ public abstract class ImportingTasklet implements Tasklet {
         var recordImporter = plugin.getImportingComponentsProvider().getRecordImporter();
 
         updateImportingStarted(recordsPartitions);
-        var importingResult = recordImporter.importRecords(importRecordsProvider);
+        ImportingResult importingResult;
+
+        try {
+            importingResult = recordImporter.importRecords(importRecordsProvider);
+        } catch (final Exception e) {
+            log.error("ImportingTasklet failed with exception: {}", e.getMessage(), e);
+            JobUtil.putRejectReason(contribution.getStepExecution(), "ImportingTasklet failed with exception: " + e.getMessage());
+            return RepeatStatus.FINISHED;
+        }
 
         if (importingResult.getImportingErrorCode().isPresent()) {
+            log.error("ImportingTasklet finished with error: {}", importingResult.getImportingErrorCode().get());
             JobUtil.putRejectReason(contribution.getStepExecution(), importingResult.getImportingErrorCode().get());
-            log.info("ImportingTasklet finished with error: {}", importingResult.getImportingErrorCode().get());
 
             recordsPartitions.forEach(records -> records.setRecordsStatus(RecordsStatus.FAILED));
             importingResult.getErrorMessages().ifPresentOrElse(

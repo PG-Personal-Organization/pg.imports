@@ -35,6 +35,7 @@ public class RejectedImportParsingMessageHandler implements MessageHandler<Rejec
         try {
             if (message.getReason() != null && (message.getRecordIds() != null) && !message.getRecordIds().isEmpty()) {
                 RecordsParsingErrorHandler parsingErrorHandler = plugin.getParsingComponentProvider().getRecordsParsingErrorHandler();
+                log.info("Handling errors cleaning in plugin: {} for import {} with handler {}", plugin.getCode(), importId, parsingErrorHandler.getClass().getSimpleName());
                 clean(message.getRecordIds(), parsingErrorHandler);
             }
         } catch (final Exception e) {

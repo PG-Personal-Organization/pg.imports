@@ -19,12 +19,12 @@ public class ReadOnlyParsedRecord<R extends RecordData> implements ParsedRecord<
     private List<String> errorMessages;
 
     @Override
-    public R getRecord() {
+    public @NonNull R getRecord() {
         return recordData;
     }
 
     @Override
-    public Long getOrdinal() {
+    public @NonNull Long getOrdinal() {
         return (long) ordinal;
     }
 

@@ -35,9 +35,9 @@ public class RejectImportImportingMessageHandler implements MessageHandler<Rejec
 
         try {
             PluginCode pluginCode = message.getPluginCode();
-            log.info("Handling errors cleaning in plugin: {} for import {}", pluginCode, importId);
             var plugin = pluginCache.getPlugin(pluginCode);
             var errorHandler = plugin.getImportingComponentsProvider().getRecordsImportingErrorHandler();
+            log.info("Handling errors cleaning in plugin: {} for import {} with handler {}", pluginCode, importId, errorHandler.getClass().getSimpleName());
             clean(message.getRecordIds(), errorHandler);
         } catch (final Exception e) {
             log.error("Error occurred during error handling in plugin, continuing without plugin involvement.", e);
