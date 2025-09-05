@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.pg</groupId>
         <artifactId>parent</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <artifactId>imports</artifactId>
     <packaging>pom</packaging>
-    <version>2.6.4</version>
+    <version>2.7.0</version>
 
     <name>pg.imports</name>
     <description>pg.imports</description>
@@ -20,12 +20,9 @@
     <properties>
         <project.version>${project.version}</project.version>
 
-        <pg-lib-common.version>2.4.1</pg-lib-common.version>
-        <pg-kafka.version>2.3.1</pg-kafka.version>
+        <pg-lib-common.version>2.5.0</pg-lib-common.version>
+        <pg-kafka.version>2.3.2</pg-kafka.version>
         <pg-context.auth.version>3.3.1</pg-context.auth.version>
-        <hibernate-core.version>6.5.3.Final</hibernate-core.version>
-        <hibernate-utils.version>3.9.0</hibernate-utils.version>
-        <beanio.version>2.1.0</beanio.version>
     </properties>
 
     <modules>
@@ -74,23 +71,6 @@
                 <groupId>pg.context-auth</groupId>
                 <artifactId>pg.context-auth.api</artifactId>
                 <version>${pg-context.auth.version}</version>
-            </dependency>
-
-            <!-- 3rd party -->
-            <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>${hibernate-core.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.hypersistence</groupId>
-                <artifactId>hypersistence-utils-hibernate-60</artifactId>
-                <version>${hibernate-utils.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.beanio</groupId>
-                <artifactId>beanio</artifactId>
-                <version>${beanio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

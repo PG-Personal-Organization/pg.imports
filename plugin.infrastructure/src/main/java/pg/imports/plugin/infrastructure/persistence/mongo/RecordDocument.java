@@ -8,7 +8,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import pg.imports.plugin.api.data.ImportRecordStatus;
-import pg.imports.plugin.api.strategies.mongo.LibraryMongoStoredRecordsPlugin;
+import pg.imports.plugin.api.ImportPlugin;
+
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -25,10 +27,7 @@ public class RecordDocument {
 
     private String partitionId;
 
-    /**
-     * De/Serialized via {@link LibraryMongoStoredRecordsPlugin#getRecordClass()}
-     */
-    private String recordData;
+    private Map<String, Object> recordData;
 
     private String recordDataClass;
 

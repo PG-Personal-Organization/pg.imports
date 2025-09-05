@@ -36,7 +36,7 @@ public class MongoImportingRecordsProvider implements ImportingRecordsProvider<R
         return ReadOnlyParsedRecord.builder()
                 .importId(recordDocument.getImportId())
                 .recordId(recordDocument.getId())
-                .recordData((RecordData) batchObjectMapper.readValue(recordDocument.getRecordData(), Class.forName(recordDocument.getRecordDataClass())))
+                .recordData((RecordData) batchObjectMapper.convertValue(recordDocument.getRecordData(), Class.forName(recordDocument.getRecordDataClass())))
                 .recordStatus(recordDocument.getRecordStatus())
                 .ordinal(recordDocument.getOrdinal())
                 .errorMessages(Arrays.stream(recordDocument.getErrorMessages().split("\n")).toList())

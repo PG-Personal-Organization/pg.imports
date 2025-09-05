@@ -29,6 +29,7 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
     private final ObjectMapper batchObjectMapper;
 
     @Override
+    @SuppressWarnings("unchecked")
     public @NonNull WrittenRecords write(final List<PartitionedRecord> records, final ImportContext importContext, final ImportPlugin plugin) {
         log.info("Writing {} records of type: {} to import mongo storage", records.size(), plugin.getRecordClass());
         var recordsToWrite = records.stream().map(partitionedRecord -> {
@@ -39,12 +40,12 @@ public class EngineMongoRecordsWriter implements RecordsWriter {
                         .importId(importedRecord.getImportId())
                         .recordStatus(importedRecord.getRecordStatus())
                         .ordinal(Math.toIntExact(importedRecord.getOrdinal()))
-                        .recordData(batchObjectMapper.writeValueAsString(importedRecord.getRecord()))
+                        .recordData(batchObjectMapper.convertValue(importedRecord.getRecord(), Map.class))
                         .recordDataClass(plugin.getRecordClass().getName())
                         .partitionId(partitionedRecord.getPartitionId())
                         .errorMessages(String.join("\n", importedRecord.getErrorMessages()))
                         .build();
-            } catch (JsonProcessingException e) {
+            } catch (final Exception e) {
                 log.error("Error during converting record: {} to mongo storage document", partitionedRecord,  e);
                 return RecordDocument.builder()
                         .id(importedRecord.getRecordId())
