@@ -4,7 +4,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.transaction.annotation.Transactional;
 import pg.imports.plugin.api.importing.CompletedImportingCleaner;
 import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
@@ -24,7 +23,6 @@ public class CompletedImportImportingMessageHandler implements MessageHandler<Co
     private int cleaningPartsSize;
 
     @Override
-    @Transactional(readOnly = true)
     public void handleMessage(final @NonNull CompletedImportEvent message) {
         var importId = message.getImportId();
         log.info("Import {} cleaning triggered", importId);
