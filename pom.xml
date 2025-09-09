@@ -12,7 +12,7 @@
 
     <artifactId>imports</artifactId>
     <packaging>pom</packaging>
-    <version>2.7.0</version>
+    <version>2.7.1</version>
 
     <name>pg.imports</name>
     <description>pg.imports</description>
@@ -22,7 +22,7 @@
 
         <pg-lib-common.version>2.5.0</pg-lib-common.version>
         <pg-kafka.version>2.3.2</pg-kafka.version>
-        <pg-context.auth.version>3.3.1</pg-context.auth.version>
+        <pg-context.auth.version>3.5.0</pg-context.auth.version>
     </properties>
 
     <modules>
