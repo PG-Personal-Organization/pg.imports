@@ -48,16 +48,19 @@ public class ConfigurationBasedImportingJobLauncher implements ImportingJobLaunc
             final var defaultJobParameters = defaultJobParameters(afterParsingImport.getImportId(), pluginCode);
             switch (importsConfigProvider.getImportingStrategy(pluginCode)) {
                 case LOCAL -> {
+                    log.info("Starting LocalImportingJob with importId={} and content={}.", afterParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(localImportingJob, defaultJobParameters);
-                    log.info("LocalImportingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
+                    log.info("LocalImportingJob finished with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
                 }
                 case LOCAL_PARALLEL -> {
+                    log.info("Starting LocalParallelImportingJob with importId={} and content={}.", afterParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(localParallelImportingJob, defaultJobParameters);
-                    log.info("LocalParallelImportingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
+                    log.info("LocalParallelImportingJob finished with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
                 }
                 case DISTRIBUTED -> {
+                    log.info("Starting DistributedImportingJob with importId={} and content={}.", afterParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(distributedImportingJob, defaultJobParameters);
-                    log.info("DistributedImportingJob launched with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
+                    log.info("DistributedImportingJob finished with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
                 }
                 default -> throw new IllegalArgumentException("Unknown importing strategy: " + importsConfigProvider.getImportingStrategy(pluginCode));
             }

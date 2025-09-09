@@ -46,16 +46,19 @@ public class ConfigurationBasedParsingJobLauncher implements ParsingJobLauncher 
             final var defaultJobParameters = defaultJobParameters(ongoingParsingImport.getImportId(), pluginCode);
             switch (importsConfigProvider.getParsingStrategy(pluginCode)) {
                 case LOCAL -> {
+                    log.info("LocalParsingJob started with importId={} and content={}.", ongoingParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(localParsingJob, defaultJobParameters);
-                    log.info("LocalParsingJob launched with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
+                    log.info("LocalParsingJob finished with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
                 case LOCAL_PARALLEL -> {
+                    log.info("LocalParallelParsingJob started with importId={} and content={}.", ongoingParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(localParallelParsingJob, defaultJobParameters);
-                    log.info("LocalParallelParsingJob launched with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
+                    log.info("LocalParallelParsingJob finished with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
                 case DISTRIBUTED -> {
+                    log.info("DistributedParsingJob started with importId={} and content={}.", ongoingParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(distributedParsingJob, defaultJobParameters);
-                    log.info("DistributedParsingJob launched with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
+                    log.info("DistributedParsingJob finished with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
                 default -> throw new IllegalArgumentException("Unknown parsing strategy: " + importsConfigProvider.getParsingStrategy(pluginCode));
             }
