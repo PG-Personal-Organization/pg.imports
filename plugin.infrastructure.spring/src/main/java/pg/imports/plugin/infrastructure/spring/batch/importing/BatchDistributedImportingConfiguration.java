@@ -2,6 +2,7 @@ package pg.imports.plugin.infrastructure.spring.batch.importing;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.integration.partition.StepExecutionRequestHandler;
@@ -13,11 +14,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.channel.QueueChannel;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.DistributedResponseConsumerGroupProvider;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.LocalJobRegistry;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.config.DistributedImportingMasterConfiguration;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.config.DistributedImportingWorkerConfiguration;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition.DistributedImportPartitionRequestSender;
@@ -65,8 +71,10 @@ public class BatchDistributedImportingConfiguration {
     }
 
     @Bean
-    public DistributedImportPartitionResponseMessageHandler distributedImportPartitionResponseMessageHandler() {
-        return new DistributedImportPartitionResponseMessageHandler(importingReplies(), jobExplorer);
+    public DistributedImportPartitionResponseMessageHandler distributedImportPartitionResponseMessageHandler(
+            final MessageChannel importingRepliesBus,
+            final DistributedResponseConsumerGroupProvider distributedResponseConsumerGroupProvider) {
+        return new DistributedImportPartitionResponseMessageHandler(importingRepliesBus, distributedResponseConsumerGroupProvider);
     }
 
     @Bean
@@ -105,9 +113,28 @@ public class BatchDistributedImportingConfiguration {
     }
 
     @Bean
-    public MessageChannel partitionReplyInbound() {
-        return new DirectChannel();
+    @Lazy(false)
+    public IntegrationFlow importingRepliesRoutingFlow(final LocalJobRegistry localJobRegistry,
+                                                     final @Lazy PollableChannel importingReplies,
+                                                     final MessageChannel importingRepliesBus) {
+        return IntegrationFlow.from(importingRepliesBus)
+                .filter(org.springframework.messaging.Message.class, msg -> {
+                    Long jobId = msg.getHeaders().get("jobExecutionId", Long.class);
+                    return jobId != null && localJobRegistry.isLocal(jobId);
+                })
+                .transform(org.springframework.messaging.Message.class, Message::getPayload)
+                .<ImportPartitionMessageResponse, StepExecution>transform(
+                        resp -> jobExplorer.getStepExecution(resp.getJobExecutionId(), resp.getStepExecutionId())
+                )
+                .channel(importingReplies)
+                .get();
     }
+
+    @Bean
+    public MessageChannel importingRepliesBus() {
+        return new PublishSubscribeChannel();
+    }
+
     @Bean
     public MessageChannel partitionRequestInbound() {
         return new DirectChannel();

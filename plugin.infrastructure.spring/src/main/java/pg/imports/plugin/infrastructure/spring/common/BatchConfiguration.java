@@ -12,12 +12,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import pg.context.auth.api.context.provider.ContextProvider;
 import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepository;
 import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.DistributedResponseConsumerGroupProvider;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.LocalJobRegistry;
 import pg.kafka.sender.EventSender;
 import pg.lib.awsfiles.infrastructure.s3.config.AmazonConfiguration;
 import pg.lib.awsfiles.service.api.FileService;
@@ -77,5 +80,14 @@ public class BatchConfiguration {
         return new JpaTransactionManager(entityManagerFactory);
     }
 
+    @Bean
+    public DistributedResponseConsumerGroupProvider distributedResponseConsumerGroupProvider(final Environment environment) {
+        return new DistributedResponseConsumerGroupProvider(environment);
+    }
+
+    @Bean
+    public LocalJobRegistry localJobRegistry() {
+        return new LocalJobRegistry();
+    }
 
 }

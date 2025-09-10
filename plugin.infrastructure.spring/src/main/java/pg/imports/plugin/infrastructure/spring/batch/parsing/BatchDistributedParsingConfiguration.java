@@ -8,6 +8,7 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.integration.chunk.ChunkResponse;
 import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageChannel;
@@ -28,6 +30,9 @@ import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepos
 import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.DistributedJobsExecutionListener;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.DistributedResponseConsumerGroupProvider;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.LocalJobRegistry;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.distributed.*;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.listeners.DistributedParsingErrorStepListener;
 import pg.imports.plugin.infrastructure.spring.batch.parsing.listeners.ParsingErrorJobListener;
@@ -103,6 +108,11 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
+    public MessageChannel parsingRepliesBus() {
+        return new PublishSubscribeChannel();
+    }
+
+    @Bean
     public PollableChannel parsingReplies() {
         return new QueueChannel();
     }
@@ -118,6 +128,15 @@ public class BatchDistributedParsingConfiguration {
 
     @Bean
     @Lazy(false)
+    public IntegrationFlow parsingRepliesRoutingFlow(final LocalJobRegistry localJobRegistry, final @Lazy PollableChannel parsingReplies, final MessageChannel parsingRepliesBus) {
+        return IntegrationFlow.from(parsingRepliesBus)
+                .filter(ChunkResponse.class, cr -> localJobRegistry.isLocal(cr.getJobId()))
+                .channel(parsingReplies)
+                .get();
+    }
+
+    @Bean
+    @Lazy(false)
     public DistributedParseChunkSender distributedParseChunkSender() {
         return new DistributedParseChunkSender(eventSender, batchObjectMapper);
     }
@@ -128,8 +147,9 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
-    public DistributedParseChunkResponseHandler distributedChunkResponseHandler() {
-        return new DistributedParseChunkResponseHandler(parsingReplies());
+    public DistributedParseChunkResponseHandler distributedChunkResponseHandler(final MessageChannel parsingRepliesBus,
+                                                                                final DistributedResponseConsumerGroupProvider distributedResponseConsumerGroupProvider) {
+        return new DistributedParseChunkResponseHandler(parsingRepliesBus, distributedResponseConsumerGroupProvider);
     }
 
     @Bean
@@ -167,8 +187,9 @@ public class BatchDistributedParsingConfiguration {
     }
 
     @Bean
-    public Job distributedParsingJob(final @Lazy TaskletStep distributedParsingStep) {
+    public Job distributedParsingJob(final @Lazy TaskletStep distributedParsingStep, final LocalJobRegistry localJobRegistry) {
         return new JobBuilder("distributedParsingJob", jobRepository)
+                .listener(new DistributedJobsExecutionListener(localJobRegistry))
                 .listener(new LoggingJobExecutionListener())
                 .listener(new ParsingErrorJobListener(eventSender, recordsRepository))
                 .start(initParsingStep)

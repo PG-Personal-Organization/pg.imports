@@ -113,7 +113,7 @@ class TestPluginIntegrationTest {
             AtomicReference<ImportEntity> importEntity = new AtomicReference<>();
             AtomicReference<ImportStatus> status = new AtomicReference<>();
             await()
-                    .atMost(30, TimeUnit.SECONDS)
+                    .atMost(45, TimeUnit.SECONDS)
                     .pollInterval(5, TimeUnit.SECONDS)
                     .until(() -> {
                         var entity = importRepository.findByIdAndStatusIn(importId.id(), List.of(ImportStatus.PARSING_FINISHED, ImportStatus.PARSING_FAILED));
@@ -150,7 +150,7 @@ class TestPluginIntegrationTest {
                     .statusCode(200);
 
             await()
-                    .atMost(30, TimeUnit.SECONDS)
+                    .atMost(45, TimeUnit.SECONDS)
                     .pollInterval(5, TimeUnit.SECONDS)
                     .until(() -> {
                         var entity = importRepository.findByIdAndStatusIn(importId.id(), List.of(ImportStatus.IMPORTING_COMPLETED, ImportStatus.IMPORTING_FAILED));

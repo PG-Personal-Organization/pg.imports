@@ -19,8 +19,9 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepository;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.DistributedJobsExecutionListener;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.LocalJobRegistry;
 import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition.DistributedImportPartitionRequestSender;
-import pg.imports.plugin.infrastructure.spring.batch.importing.distributed.partition.ImportPartitionMessageResponse;
 import pg.imports.plugin.infrastructure.spring.batch.importing.listeners.ImportingErrorJobListener;
 import pg.imports.plugin.infrastructure.spring.batch.importing.partition.ImportingPartitioner;
 import pg.imports.plugin.infrastructure.spring.common.listeners.LoggingJobExecutionListener;
@@ -40,7 +41,6 @@ public class DistributedImportingMasterConfiguration {
 
     private final MessageChannel importingRequests;
     private final PollableChannel importingReplies;
-    private final MessageChannel partitionReplyInbound;
 
     private final DistributedImportPartitionRequestSender distributedImportPartitionRequestSender;
 
@@ -72,8 +72,9 @@ public class DistributedImportingMasterConfiguration {
     }
 
     @Bean
-    public Job distributedImportingJob(final @Lazy Step distributedImportingStep) {
+    public Job distributedImportingJob(final @Lazy Step distributedImportingStep, final LocalJobRegistry localJobRegistry) {
         return new JobBuilder("distributedImportingJob", jobRepository)
+                .listener(new DistributedJobsExecutionListener(localJobRegistry))
                 .listener(new LoggingJobExecutionListener())
                 .listener(new ImportingErrorJobListener(eventSender, recordsRepository))
                 .start(initImportingStep)
@@ -88,18 +89,6 @@ public class DistributedImportingMasterConfiguration {
         return IntegrationFlow
                 .from(importingRequests)
                 .handle(distributedImportPartitionRequestSender)
-                .get();
-    }
-
-    @Bean
-    @Lazy(false)
-    public IntegrationFlow inboundPartitionReplies() {
-        return IntegrationFlow
-                .from(partitionReplyInbound)
-                .<ImportPartitionMessageResponse, org.springframework.batch.core.StepExecution>transform(
-                        response -> jobExplorer.getStepExecution(response.getJobExecutionId(), response.getStepExecutionId())
-                )
-                .channel(importingReplies)
                 .get();
     }
 }
