@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.LocalJobRegistry;
 import pg.kafka.sender.EventSender;
 import pg.lib.awsfiles.service.api.FileService;
 import pg.imports.plugin.api.ImportPlugin;
@@ -69,10 +70,12 @@ public class ParsingConfiguration {
                                                  final JobLauncher jobLauncher,
                                                  final Job localParsingJob,
                                                  final Job localParallelParsingJob,
-                                                 final Job distributedParsingJob) {
+                                                 final Job distributedParsingJob,
+                                                 final LocalJobRegistry localJobRegistry) {
         return new ConfigurationBasedParsingJobLauncher(importRepository,
                 importsConfigProvider,
                 jobLauncher,
+                localJobRegistry,
                 localParsingJob,
                 localParallelParsingJob,
                 distributedParsingJob);

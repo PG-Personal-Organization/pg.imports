@@ -18,6 +18,7 @@ import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepos
 import pg.imports.plugin.infrastructure.persistence.database.imports.ImportStatus;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.LocalJobRegistry;
 import pg.imports.plugin.infrastructure.states.OngoingImportingImport;
 
 @Log4j2
@@ -26,6 +27,7 @@ public class ConfigurationBasedImportingJobLauncher implements ImportingJobLaunc
     private final ImportRepository importRepository;
     private final ImportsConfigProvider importsConfigProvider;
     private final JobLauncher jobLauncher;
+    private final LocalJobRegistry localJobRegistry;
 
     private final Job localImportingJob;
     private final Job localParallelImportingJob;
@@ -60,6 +62,7 @@ public class ConfigurationBasedImportingJobLauncher implements ImportingJobLaunc
                 case DISTRIBUTED -> {
                     log.info("Starting DistributedImportingJob with importId={} and content={}.", afterParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(distributedImportingJob, defaultJobParameters);
+                    localJobRegistry.register(jobExecution.getId());
                     log.info("DistributedImportingJob finished with importId={} and content={}.", afterParsingImport.getImportId(), jobExecution);
                 }
                 default -> throw new IllegalArgumentException("Unknown importing strategy: " + importsConfigProvider.getImportingStrategy(pluginCode));

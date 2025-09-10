@@ -21,6 +21,7 @@ import pg.imports.plugin.infrastructure.persistence.database.records.RecordsRepo
 import pg.imports.plugin.infrastructure.persistence.database.records.db.RecordRepository;
 import pg.imports.plugin.infrastructure.persistence.mongo.MongoRecordRepository;
 import pg.imports.plugin.infrastructure.plugins.PluginCache;
+import pg.imports.plugin.infrastructure.spring.batch.common.distributed.LocalJobRegistry;
 import pg.imports.plugin.infrastructure.spring.batch.importing.records.provider.ImportingRecordsProviderFactory;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.ImportingFinisherTasklet;
 import pg.imports.plugin.infrastructure.spring.batch.importing.tasklets.ImportingInitializerTasklet;
@@ -56,11 +57,13 @@ public class ImportingConfiguration {
                                                      final JobLauncher jobLauncher,
                                                      final Job localImportingJob,
                                                      final Job localParallelImportingJob,
-                                                     final Job distributedImportingJob
+                                                     final Job distributedImportingJob,
+                                                     final LocalJobRegistry localJobRegistry
     ) {
         return new ConfigurationBasedImportingJobLauncher(importRepository,
                 importsConfigProvider,
                 jobLauncher,
+                localJobRegistry,
                 localImportingJob,
                 localParallelImportingJob,
                 distributedImportingJob);
