@@ -18,7 +18,6 @@ import pg.imports.plugin.infrastructure.persistence.database.imports.ImportRepos
 import pg.imports.plugin.infrastructure.persistence.database.imports.ImportStatus;
 import pg.imports.plugin.infrastructure.spring.batch.common.JobUtil;
 import pg.imports.plugin.infrastructure.config.ImportsConfigProvider;
-import pg.imports.plugin.infrastructure.spring.batch.common.distributed.LocalJobRegistry;
 import pg.imports.plugin.infrastructure.states.OngoingParsingImport;
 
 @Log4j2
@@ -27,7 +26,6 @@ public class ConfigurationBasedParsingJobLauncher implements ParsingJobLauncher 
     private final ImportRepository importRepository;
     private final ImportsConfigProvider importsConfigProvider;
     private final JobLauncher jobLauncher;
-    private final LocalJobRegistry localJobRegistry;
 
     private final Job localParsingJob;
     private final Job localParallelParsingJob;
@@ -50,15 +48,17 @@ public class ConfigurationBasedParsingJobLauncher implements ParsingJobLauncher 
                 case LOCAL -> {
                     log.info("LocalParsingJob started with importId={} and content={}.", ongoingParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(localParsingJob, defaultJobParameters);
+                    log.info("LocalParsingJob finished with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
                 case LOCAL_PARALLEL -> {
                     log.info("LocalParallelParsingJob started with importId={} and content={}.", ongoingParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(localParallelParsingJob, defaultJobParameters);
+                    log.info("LocalParallelParsingJob finished with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
                 case DISTRIBUTED -> {
                     log.info("DistributedParsingJob started with importId={} and content={}.", ongoingParsingImport.getImportId(), defaultJobParameters);
                     jobExecution = jobLauncher.run(distributedParsingJob, defaultJobParameters);
-                    localJobRegistry.register(jobExecution.getId());
+                    log.info("DistributedParsingJob finished with importId={} and content={}.", ongoingParsingImport.getImportId(), jobExecution);
                 }
                 default -> throw new IllegalArgumentException("Unknown parsing strategy: " + importsConfigProvider.getParsingStrategy(pluginCode));
             }
